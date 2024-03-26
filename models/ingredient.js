@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // Define association here
       Ingredient.belongsTo(models.Recipe, {
-        foreignKey: 'recipeId', // Ensure this matches the foreign key in the database
-        as: 'recipe', // Optional: specify an alias for when you join Ingredient to Recipe
-        onDelete: 'CASCADE' // If a Recipe is deleted, its Ingredients are also deleted
+        foreignKey: 'recipeId',
+        as: 'recipe',
+        onDelete: 'CASCADE'
       });
     }
   }
@@ -24,12 +24,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Recipes', // Note: The model name 'Recipe' is usually pluralized by Sequelize
+        model: 'Recipes',
         key: 'id',
       }
     },
-    name: DataTypes.STRING,
-    quantity: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false, // Ensures this field cannot be null
+      validate: {
+        notEmpty: { msg: "Name must not be empty" }, // Validates field is not an empty string
+      }
+    },
+    quantity: {
+      type: DataTypes.STRING,
+      allowNull: false, // Ensures this field cannot be null
+      validate: {
+        notEmpty: { msg: "Quantity must not be empty" }, // Validates field is not an empty string
+      }
+    }
   }, {
     sequelize,
     modelName: 'Ingredient',
