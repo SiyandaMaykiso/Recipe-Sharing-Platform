@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Recipe extends Model {
@@ -11,59 +9,67 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Define association here
       Recipe.belongsTo(models.User, {
         foreignKey: 'userId',
-        as: 'user', // Optional: specify an alias for when you join User to Recipe
+        as: 'user',
         onDelete: 'CASCADE'
       });
 
-      // If you plan to add Ingredients, Comments, and Ratings:
       Recipe.hasMany(models.Ingredient, {
         foreignKey: 'recipeId',
-        as: 'ingredients', // Alias for when you join Recipe to Ingredients
+        as: 'ingredients',
         onDelete: 'CASCADE'
       });
 
       Recipe.hasMany(models.Comment, {
         foreignKey: 'recipeId',
-        as: 'comments', // Alias for when you join Recipe to Comments
+        as: 'comments',
         onDelete: 'CASCADE'
       });
 
       Recipe.hasMany(models.Rating, {
         foreignKey: 'recipeId',
-        as: 'ratings', // Alias for when you join Recipe to Ratings
+        as: 'ratings',
         onDelete: 'CASCADE'
       });
     }
-  }
+  };
+
   Recipe.init({
-    userId: DataTypes.INTEGER,
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id',
+      }
+    },
     title: {
       type: DataTypes.STRING,
-      allowNull: false, // Ensures this field cannot be null
+      allowNull: false,
       validate: {
-        notEmpty: { msg: "Title must not be empty" }, // Validates field is not an empty string
+        notEmpty: { msg: "Title must not be empty" },
+        // Additional validations can be defined here if needed
       }
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false, // Ensures this field cannot be null
+      allowNull: false,
       validate: {
-        notEmpty: { msg: "Description must not be empty" }, // Validates field is not an empty string
+        notEmpty: { msg: "Description must not be empty" },
       }
     },
     creationDate: {
       type: DataTypes.DATE,
-      allowNull: false, // Ensures this field cannot be null
+      allowNull: false,
       validate: {
-        isDate: { msg: "Must be a valid date" }, // Validates field is a valid date
+        isDate: { msg: "Must be a valid date" },
       }
     },
   }, {
     sequelize,
     modelName: 'Recipe',
   });
+
   return Recipe;
 };
