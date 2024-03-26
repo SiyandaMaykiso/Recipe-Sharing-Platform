@@ -11,16 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // Define associations here
       Comment.belongsTo(models.User, {
         foreignKey: 'userId',
-        as: 'user', // Optional: specify an alias for easier querying
-        onDelete: 'CASCADE' // Ensures comments are deleted if the user is deleted
+        as: 'user',
+        onDelete: 'CASCADE'
       });
       Comment.belongsTo(models.Recipe, {
         foreignKey: 'recipeId',
-        as: 'recipe', // Optional: specify an alias for easier querying
-        onDelete: 'CASCADE' // Ensures comments are deleted if the recipe is deleted
+        as: 'recipe',
+        onDelete: 'CASCADE'
       });
     }
   }
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Recipes', // Note: Sequelize pluralizes the model name
+        model: 'Recipes',
         key: 'id',
       }
     },
@@ -37,12 +37,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Users', // Note: Sequelize pluralizes the model name
+        model: 'Users',
         key: 'id',
       }
     },
-    commentText: DataTypes.TEXT,
-    commentDate: DataTypes.DATE
+    commentText: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: "Comment text must not be empty" },
+      }
+    },
+    commentDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      // If using Sequelize's `createdAt`, this field may be redundant
+    }
   }, {
     sequelize,
     modelName: 'Comment',
