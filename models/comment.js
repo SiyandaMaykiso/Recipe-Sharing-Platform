@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Comment extends Model {
@@ -47,12 +45,8 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         notEmpty: { msg: "Comment text must not be empty" },
       }
-    },
-    commentDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      // If using Sequelize's `createdAt`, this field may be redundant
     }
+    // Removed the commentDate field to rely on Sequelize's `createdAt`
   }, {
     sequelize,
     modelName: 'Comment',
