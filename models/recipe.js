@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Recipe extends Model {
     /**
@@ -10,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // Define association here
       Recipe.belongsTo(models.User, {
         foreignKey: 'userId',
         as: 'user', // Optional: specify an alias for when you join User to Recipe
@@ -39,9 +40,27 @@ module.exports = (sequelize, DataTypes) => {
   }
   Recipe.init({
     userId: DataTypes.INTEGER,
-    title: DataTypes.STRING,
-    description: DataTypes.TEXT,
-    creationDate: DataTypes.DATE
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false, // Ensures this field cannot be null
+      validate: {
+        notEmpty: { msg: "Title must not be empty" }, // Validates field is not an empty string
+      }
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false, // Ensures this field cannot be null
+      validate: {
+        notEmpty: { msg: "Description must not be empty" }, // Validates field is not an empty string
+      }
+    },
+    creationDate: {
+      type: DataTypes.DATE,
+      allowNull: false, // Ensures this field cannot be null
+      validate: {
+        isDate: { msg: "Must be a valid date" }, // Validates field is a valid date
+      }
+    },
   }, {
     sequelize,
     modelName: 'Recipe',
