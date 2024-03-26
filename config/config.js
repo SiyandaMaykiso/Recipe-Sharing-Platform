@@ -4,8 +4,8 @@ module.exports = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: 'postgres',
     port: process.env.DB_PORT
-  }
-  // Add other environments (test, production) as needed
+  },
+  // Add configurations for test and production if needed
 };
