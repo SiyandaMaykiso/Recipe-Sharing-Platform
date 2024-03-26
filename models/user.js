@@ -1,36 +1,14 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // A user can have many recipes
-      User.hasMany(models.Recipe, {
-        foreignKey: 'userId',
-        as: 'recipes', // This alias is optional but helpful for readability
-        onDelete: 'CASCADE', // Ensures user deletion cascades to recipes
-      });
-
-      // A user can have many comments
-      User.hasMany(models.Comment, {
-        foreignKey: 'userId',
-        as: 'comments', // This alias is optional but helpful for readability
-        onDelete: 'CASCADE', // Ensures user deletion cascades to comments
-      });
-
-      // A user can have many ratings
-      User.hasMany(models.Rating, {
-        foreignKey: 'userId',
-        as: 'ratings', // This alias is optional but helpful for readability
-        onDelete: 'CASCADE', // Ensures user deletion cascades to ratings
-      });
+      // Associations can be defined here
+      User.hasMany(models.Recipe, { foreignKey: 'userId', as: 'recipes', onDelete: 'CASCADE' });
+      User.hasMany(models.Comment, { foreignKey: 'userId', as: 'comments', onDelete: 'CASCADE' });
+      User.hasMany(models.Rating, { foreignKey: 'userId', as: 'ratings', onDelete: 'CASCADE' });
     }
   }
 
@@ -38,23 +16,24 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: {
-        msg: 'This username is already taken.'
-      },
+      unique: true,
       validate: {
-        notNull: { msg: "Username is required" },
         notEmpty: { msg: "Username must not be empty" },
+        // Custom validator for username
+        isValidUsername(value) {
+          const prohibitedPattern = /[^a-zA-Z0-9]+/; // Example: Disallow special characters
+          if (prohibitedPattern.test(value)) {
+            throw new Error('Username must only contain letters and numbers');
+          }
+        }
       }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: {
-        msg: 'This email is already in use.'
-      },
+      unique: true,
       validate: {
         isEmail: { msg: "Must be a valid email address" },
-        notNull: { msg: "Email is required" },
         notEmpty: { msg: "Email must not be empty" },
       }
     },
@@ -62,17 +41,35 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notNull: { msg: "Password is required" },
         notEmpty: { msg: "Password must not be empty" },
+        // Custom validator for password complexity
+        isComplexEnough(value) {
+          const hasNumber = /\d/;
+          const hasSpecialChar = /[!@#\$%\^\&*\)\(+=._-]/;
+          if (!hasNumber.test(value) || !hasSpecialChar.test(value)) {
+            throw new Error('Password must include at least one number and one special character');
+          }
+        },
         len: {
-          args: [7, 42],
-          msg: "Password must be between 7 and 42 characters long",
+          args: [8, 100], // Adjusted to enforce minimum length of 8 characters
+          msg: "Password must be at least 8 characters long",
         },
       }
     },
   }, {
     sequelize,
     modelName: 'User',
+  });
+
+  // Hooks for password hashing
+  User.beforeCreate(async (user, options) => {
+    user.password = await bcrypt.hash(user.password, 10);
+  });
+
+  User.beforeUpdate(async (user, options) => {
+    if (user.changed('password')) {
+      user.password = await bcrypt.hash(user.password, 10);
+    }
   });
 
   return User;
