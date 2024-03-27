@@ -29,12 +29,21 @@ exports.getProfile = async (req, res) => {
 exports.updateUserInfo = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming req.user is set by your auth middleware
-    const { username, email } = req.body; // Example: Allow updating username and email
-    const updatedUser = await User.update({ username, email }, { where: { id: userId } });
-    if (!updatedUser) {
+    const { username, email } = req.body;
+    // Update user information
+    const [numberOfAffectedRows] = await User.update({ username, email }, { where: { id: userId } });
+    
+    if (numberOfAffectedRows === 0) {
+      // No rows were affected, which means the user was not found
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "User information updated successfully" });
+    
+    // Fetch the updated user information to send back as response
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password'] } // Exclude the password from the response
+    });
+
+    res.status(200).json({ message: "User information updated successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Error updating user information", error: error.message });
   }

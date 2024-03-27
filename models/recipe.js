@@ -33,14 +33,14 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE'
       });
     }
-  };
+  }
 
   Recipe.init({
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Users',
+        model: 'users', // This should match exactly the table name in lowercase
         key: 'id',
       }
     },
@@ -49,7 +49,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         notEmpty: { msg: "Title must not be empty" },
-        // Additional validations can be defined here if needed
       }
     },
     description: {
@@ -69,6 +68,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Recipe',
+    tableName: 'recipes', // Explicitly specify the table name here
+    freezeTableName: true, // Prevent Sequelize from automatically pluralizing the table name
   });
 
   return Recipe;
