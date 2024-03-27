@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-// bodyParser is included with Express 4.16 and later, so direct use of express.json() and express.urlencoded() is recommended
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -11,11 +10,13 @@ const { sequelize } = require('./models'); // Adjust the path according to your 
 app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
-// Import user routes
+// Import routes
 const userRoutes = require('./routes/userRoutes'); // Adjust the path as necessary
+const recipeRoutes = require('./routes/recipeRoutes'); // Ensure you have this file set up
 
-// Use user routes with '/api/users' prefix
+// Use routes with their respective prefixes
 app.use('/api/users', userRoutes);
+app.use('/api/recipes', recipeRoutes); // Include recipe routes in the server setup
 
 // Root route
 app.get('/', (req, res) => {
