@@ -1,17 +1,9 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Ingredient extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // Define association here
       Ingredient.belongsTo(models.Recipe, {
         foreignKey: 'recipeId',
         as: 'recipe',
@@ -23,28 +15,23 @@ module.exports = (sequelize, DataTypes) => {
     recipeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Recipes',
-        key: 'id',
-      }
+      references: { model: 'recipes', key: 'id' }, // Ensure this matches your table name
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false, // Ensures this field cannot be null
-      validate: {
-        notEmpty: { msg: "Name must not be empty" }, // Validates field is not an empty string
-      }
+      allowNull: false,
+      validate: { notEmpty: { msg: "Name must not be empty" } },
     },
     quantity: {
       type: DataTypes.STRING,
-      allowNull: false, // Ensures this field cannot be null
-      validate: {
-        notEmpty: { msg: "Quantity must not be empty" }, // Validates field is not an empty string
-      }
+      allowNull: false,
+      validate: { notEmpty: { msg: "Quantity must not be empty" } },
     }
   }, {
     sequelize,
     modelName: 'Ingredient',
+    tableName: 'ingredients', // Explicitly set the table name to 'ingredients'
+    freezeTableName: true // Prevent Sequelize from altering the table name
   });
   return Ingredient;
 };

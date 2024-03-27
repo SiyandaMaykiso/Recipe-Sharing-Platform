@@ -20,12 +20,12 @@ module.exports = (sequelize, DataTypes) => {
     recipeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: 'Recipes', key: 'id' },
+      references: { model: 'recipes', key: 'id' }, // Ensure this matches your table name
     },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: 'Users', key: 'id' },
+      references: { model: 'users', key: 'id' }, // Ensure this matches your table name
     },
     rating: {
       type: DataTypes.INTEGER,
@@ -35,10 +35,12 @@ module.exports = (sequelize, DataTypes) => {
         max: { args: [5], msg: "Rating cannot be more than 5" }
       }
     },
-    ratingDate: DataTypes.DATE // Consider removing if not needed
+    ratingDate: DataTypes.DATE // Consider if this column is necessary, or if Sequelize's createdAt could be used
   }, {
     sequelize,
     modelName: 'Rating',
+    tableName: 'ratings', // Explicitly set the table name to 'ratings'
+    freezeTableName: true // Prevent Sequelize from altering the table name
   });
   return Rating;
 };

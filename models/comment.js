@@ -3,13 +3,7 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Comment extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // Define associations here
       Comment.belongsTo(models.User, {
         foreignKey: 'userId',
         as: 'user',
@@ -26,30 +20,24 @@ module.exports = (sequelize, DataTypes) => {
     recipeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Recipes',
-        key: 'id',
-      }
+      references: { model: 'recipes', key: 'id' }, // Adjust the model reference to lowercase
     },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id',
-      }
+      references: { model: 'users', key: 'id' }, // Adjust the model reference to lowercase
     },
     commentText: {
       type: DataTypes.TEXT,
       allowNull: false,
-      validate: {
-        notEmpty: { msg: "Comment text must not be empty" },
-      }
+      validate: { notEmpty: { msg: "Comment text must not be empty" } },
     }
     // Removed the commentDate field to rely on Sequelize's `createdAt`
   }, {
     sequelize,
     modelName: 'Comment',
+    tableName: 'comments', // Explicitly specify the table name to be 'comments'
+    freezeTableName: true // Prevents Sequelize from altering the table name
   });
   return Comment;
 };

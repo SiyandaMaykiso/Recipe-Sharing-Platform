@@ -59,6 +59,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
+    tableName: 'users', // Explicitly setting the table name to 'users'
+    freezeTableName: true // Prevents Sequelize from pluralizing the table name
   });
 
   // Hooks for password hashing
