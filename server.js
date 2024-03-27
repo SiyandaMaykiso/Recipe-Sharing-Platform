@@ -14,11 +14,15 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 const userRoutes = require('./routes/userRoutes'); // Adjust the path as necessary
 const recipeRoutes = require('./routes/recipeRoutes'); // Ensure you have this file set up
 const ingredientRoutes = require('./routes/ingredientRoutes'); // Adjust path as necessary
+const commentRoutes = require('./routes/commentRoutes');
+const ratingRoutes = require('./routes/ratingRoutes');
 
 // Use routes with their respective prefixes
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes); // Include recipe routes in the server setup
 app.use('/api/ingredients', ingredientRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 // Root route
 app.get('/', (req, res) => {
