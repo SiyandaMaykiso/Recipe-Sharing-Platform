@@ -49,6 +49,11 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    // Decode and inspect the JWT token payload
+    const decodedToken = jwt.decode(token);
+    console.log(decodedToken); // Log the decoded token payload
+
     res.json({
       token,
       user: {
