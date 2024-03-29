@@ -1,76 +1,96 @@
-'use strict';
-const { Model } = require('sequelize');
+const db = require('../db'); // Ensure the path is correct based on your project structure
 
-module.exports = (sequelize, DataTypes) => {
-  class Recipe extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      Recipe.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'user',
-        onDelete: 'CASCADE'
-      });
-
-      Recipe.hasMany(models.Ingredient, {
-        foreignKey: 'recipeId',
-        as: 'ingredients',
-        onDelete: 'CASCADE'
-      });
-
-      Recipe.hasMany(models.Comment, {
-        foreignKey: 'recipeId',
-        as: 'comments',
-        onDelete: 'CASCADE'
-      });
-
-      Recipe.hasMany(models.Rating, {
-        foreignKey: 'recipeId',
-        as: 'ratings',
-        onDelete: 'CASCADE'
-      });
+const Recipe = {
+  // Create a new recipe
+  async create({ userId, title, description, creationDate }) {
+    const query = `
+      INSERT INTO Recipes (user_id, title, description, creation_date)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+    const values = [userId, title, description, creationDate];
+    try {
+      const { rows } = await db.query(query, values);
+      return rows[0];
+    } catch (error) {
+      console.error('Error creating recipe', error);
+      throw error;
     }
-  }
+  },
 
-  Recipe.init({
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users', // This should match exactly the table name in lowercase
-        key: 'id',
+  // Get a single recipe by ID
+  async findById(recipeId) {
+    const query = 'SELECT * FROM Recipes WHERE recipe_id = $1';
+    const values = [recipeId];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Recipe not found');
       }
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "Title must not be empty" },
-      }
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: "Description must not be empty" },
-      }
-    },
-    creationDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        isDate: { msg: "Must be a valid date" },
-      }
-    },
-  }, {
-    sequelize,
-    modelName: 'Recipe',
-    tableName: 'recipes', // Explicitly specify the table name here
-    freezeTableName: true, // Prevent Sequelize from automatically pluralizing the table name
-  });
+      return rows[0];
+    } catch (error) {
+      console.error('Error finding recipe', error);
+      throw error;
+    }
+  },
 
-  return Recipe;
+  // Update a recipe
+  async update(recipeId, { title, description }) {
+    const query = `
+      UPDATE Recipes
+      SET title = $2, description = $3
+      WHERE recipe_id = $1
+      RETURNING *;
+    `;
+    const values = [recipeId, title, description];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Recipe not found or not updated');
+      }
+      return rows[0];
+    } catch (error) {
+      console.error('Error updating recipe', error);
+      throw error;
+    }
+  },
+
+  // Delete a recipe
+  async delete(recipeId) {
+    const query = 'DELETE FROM Recipes WHERE recipe_id = $1 RETURNING *;';
+    const values = [recipeId];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Recipe not found or not deleted');
+      }
+      return rows[0];
+    } catch (error) {
+      console.error('Error deleting recipe', error);
+      throw error;
+    }
+  },
+
+  // List all recipes or by user
+  async findAll({ userId } = {}) {
+    let query = 'SELECT * FROM Recipes';
+    const values = [];
+
+    if (userId) {
+      query += ' WHERE user_id = $1';
+      values.push(userId);
+    }
+
+    try {
+      const { rows } = await db.query(query, values);
+      return rows;
+    } catch (error) {
+      console.error('Error listing recipes', error);
+      throw error;
+    }
+  },
+
+  // Additional methods as needed...
 };
+
+module.exports = Recipe;

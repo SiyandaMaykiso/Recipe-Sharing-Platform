@@ -1,43 +1,74 @@
-'use strict';
-const { Model } = require('sequelize');
+const db = require('../db'); // Adjust the path as necessary for your project structure
 
-module.exports = (sequelize, DataTypes) => {
-  class Comment extends Model {
-    static associate(models) {
-      Comment.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'user',
-        onDelete: 'CASCADE'
-      });
-      Comment.belongsTo(models.Recipe, {
-        foreignKey: 'recipeId',
-        as: 'recipe',
-        onDelete: 'CASCADE'
-      });
+const Comment = {
+  // Add a new comment to a recipe
+  async create({ recipeId, userId, commentText }) {
+    const query = `
+      INSERT INTO Comments (recipe_id, user_id, comment_text, comment_date)
+      VALUES ($1, $2, $3, NOW())
+      RETURNING *;
+    `;
+    const values = [recipeId, userId, commentText];
+    try {
+      const { rows } = await db.query(query, values);
+      return rows[0];
+    } catch (error) {
+      console.error('Error adding comment', error);
+      throw error;
     }
-  }
-  Comment.init({
-    recipeId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: 'recipes', key: 'id' }, // Adjust the model reference to lowercase
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: 'users', key: 'id' }, // Adjust the model reference to lowercase
-    },
-    commentText: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      validate: { notEmpty: { msg: "Comment text must not be empty" } },
+  },
+
+  // Get all comments for a recipe
+  async findByRecipeId(recipeId) {
+    const query = 'SELECT * FROM Comments WHERE recipe_id = $1 ORDER BY comment_date DESC';
+    const values = [recipeId];
+    try {
+      const { rows } = await db.query(query, values);
+      return rows;
+    } catch (error) {
+      console.error('Error finding comments for recipe', error);
+      throw error;
     }
-    // Removed the commentDate field to rely on Sequelize's `createdAt`
-  }, {
-    sequelize,
-    modelName: 'Comment',
-    tableName: 'comments', // Explicitly specify the table name to be 'comments'
-    freezeTableName: true // Prevents Sequelize from altering the table name
-  });
-  return Comment;
+  },
+
+  // Update a comment
+  async update(commentId, { commentText }) {
+    const query = `
+      UPDATE Comments
+      SET comment_text = $2, comment_date = NOW()
+      WHERE comment_id = $1
+      RETURNING *;
+    `;
+    const values = [commentId, commentText];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Comment not found or not updated');
+      }
+      return rows[0];
+    } catch (error) {
+      console.error('Error updating comment', error);
+      throw error;
+    }
+  },
+
+  // Delete a comment
+  async delete(commentId) {
+    const query = 'DELETE FROM Comments WHERE comment_id = $1 RETURNING *;';
+    const values = [commentId];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Comment not found or not deleted');
+      }
+      return rows[0];
+    } catch (error) {
+      console.error('Error deleting comment', error);
+      throw error;
+    }
+  },
+
+  // Additional methods as needed...
 };
+
+module.exports = Comment;

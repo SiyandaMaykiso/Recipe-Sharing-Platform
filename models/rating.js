@@ -1,46 +1,74 @@
-'use strict';
-const { Model } = require('sequelize');
+const db = require('../db'); // Ensure the path is correctly adjusted to your project structure
 
-module.exports = (sequelize, DataTypes) => {
-  class Rating extends Model {
-    static associate(models) {
-      Rating.belongsTo(models.User, {
-        foreignKey: 'userId',
-        as: 'user',
-        onDelete: 'CASCADE'
-      });
-      Rating.belongsTo(models.Recipe, {
-        foreignKey: 'recipeId',
-        as: 'recipe',
-        onDelete: 'CASCADE'
-      });
+const Rating = {
+  // Add a new rating to a recipe by a user
+  async create({ recipeId, userId, rating }) {
+    const query = `
+      INSERT INTO Ratings (recipe_id, user_id, rating, rating_date)
+      VALUES ($1, $2, $3, NOW())
+      RETURNING *;
+    `;
+    const values = [recipeId, userId, rating];
+    try {
+      const { rows } = await db.query(query, values);
+      return rows[0];
+    } catch (error) {
+      console.error('Error adding rating', error);
+      throw error;
     }
-  }
-  Rating.init({
-    recipeId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: 'recipes', key: 'id' }, // Ensure this matches your table name
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: { model: 'users', key: 'id' }, // Ensure this matches your table name
-    },
-    rating: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: { args: [1], msg: "Rating must be at least 1" },
-        max: { args: [5], msg: "Rating cannot be more than 5" }
+  },
+
+  // Get all ratings for a recipe
+  async findByRecipeId(recipeId) {
+    const query = 'SELECT * FROM Ratings WHERE recipe_id = $1';
+    const values = [recipeId];
+    try {
+      const { rows } = await db.query(query, values);
+      return rows;
+    } catch (error) {
+      console.error('Error finding ratings for recipe', error);
+      throw error;
+    }
+  },
+
+  // Update a rating
+  async update(ratingId, { rating }) {
+    const query = `
+      UPDATE Ratings
+      SET rating = $2, rating_date = NOW()
+      WHERE rating_id = $1
+      RETURNING *;
+    `;
+    const values = [ratingId, rating];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Rating not found or not updated');
       }
-    },
-    ratingDate: DataTypes.DATE // Consider if this column is necessary, or if Sequelize's createdAt could be used
-  }, {
-    sequelize,
-    modelName: 'Rating',
-    tableName: 'ratings', // Explicitly set the table name to 'ratings'
-    freezeTableName: true // Prevent Sequelize from altering the table name
-  });
-  return Rating;
+      return rows[0];
+    } catch (error) {
+      console.error('Error updating rating', error);
+      throw error;
+    }
+  },
+
+  // Delete a rating
+  async delete(ratingId) {
+    const query = 'DELETE FROM Ratings WHERE rating_id = $1 RETURNING *;';
+    const values = [ratingId];
+    try {
+      const { rows } = await db.query(query, values);
+      if (!rows.length) {
+        throw new Error('Rating not found or not deleted');
+      }
+      return rows[0];
+    } catch (error) {
+      console.error('Error deleting rating', error);
+      throw error;
+    }
+  },
+
+  // Additional methods as needed...
 };
+
+module.exports = Rating;

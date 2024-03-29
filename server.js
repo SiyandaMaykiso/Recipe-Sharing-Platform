@@ -31,7 +31,10 @@ app.get('/', (req, res) => {
 
 // Check database connection and start server
 sequelize.authenticate()
-  .then(() => console.log('Database connected...'))
+  .then(() => {
+    console.log('Database connected...');
+    console.log("JWT Secret Key:", process.env.JWT_SECRET); // Logging JWT Secret Key
+  })
   .catch(err => console.log('Error: ' + err))
 
 app.listen(PORT, () => {
