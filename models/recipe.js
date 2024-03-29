@@ -63,9 +63,9 @@ const Recipe = {
     try {
       const { rows } = await db.query(query, values);
       if (!rows.length) {
-        throw new Error('Recipe not found or not deleted');
+        return false; // No rows affected, recipe not found
       }
-      return rows[0];
+      return true; // Recipe found and deleted
     } catch (error) {
       console.error('Error deleting recipe', error);
       throw error;

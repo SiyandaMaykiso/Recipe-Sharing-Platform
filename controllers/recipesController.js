@@ -54,9 +54,14 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
     const { id } = req.params;
     try {
-        await Recipe.delete(id);
-        res.status(204).send(); // No content to send back
+        const result = await Recipe.delete(id);
+        if (result) {
+            res.status(204).send(); // No content to send back for a successful deletion
+        } else {
+            res.status(404).json({ message: 'Recipe not found' });
+        }
     } catch (error) {
+        console.error('Error deleting recipe', error);
         res.status(500).json({ message: 'Error deleting recipe', error: error.message });
     }
 };
