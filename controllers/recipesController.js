@@ -2,9 +2,11 @@ const Recipe = require('../models/recipe'); // Adjust the path as necessary
 
 // Create a new recipe
 exports.create = async (req, res) => {
-    const { userId, title, description, creationDate } = req.body; // Assume these are provided in the request
+    // Changed from 'userId' to 'user_id' to match expected payload key
+    const { user_id, title, description, creationDate } = req.body; 
     try {
-        const newRecipe = await Recipe.create({ userId, title, description, creationDate });
+        // Adjusted to pass 'userId: user_id' to match the model's expectations
+        const newRecipe = await Recipe.create({ userId: user_id, title, description, creationDate });
         res.status(201).json({ message: 'Recipe created successfully', recipe: newRecipe });
     } catch (error) {
         res.status(500).json({ message: 'Error creating recipe', error: error.message });

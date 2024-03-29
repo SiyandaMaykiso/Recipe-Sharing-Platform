@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const recipesController = require('../controllers/recipesController'); // Adjust the path as necessary
-const { authenticate } = require('../controllers/userController'); // Import the authentication middleware
+const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
 // Create a new recipe (Protected route)
 router.post('/recipes', authenticate, recipesController.create);

@@ -1,14 +1,18 @@
 const db = require('../db'); // Ensure the path is correct based on your project structure
 
 const Recipe = {
-  // Create a new recipe
-  async create({ userId, title, description, creationDate }) {
+  // Adjusted Create a new recipe method to handle creationDate automatically
+  async create({ userId, title, description, creationDate = new Date() }) {
+    // Automatically sets creationDate to current date if not provided
+    // Ensure the date is formatted to YYYY-MM-DD for PostgreSQL compatibility
+    const formattedCreationDate = creationDate instanceof Date ? creationDate.toISOString().split('T')[0] : creationDate;
+
     const query = `
       INSERT INTO Recipes (user_id, title, description, creation_date)
       VALUES ($1, $2, $3, $4)
       RETURNING *;
     `;
-    const values = [userId, title, description, creationDate];
+    const values = [userId, title, description, formattedCreationDate];
     try {
       const { rows } = await db.query(query, values);
       return rows[0];
@@ -18,7 +22,6 @@ const Recipe = {
     }
   },
 
-  // Get a single recipe by ID
   async findById(recipeId) {
     const query = 'SELECT * FROM Recipes WHERE recipe_id = $1';
     const values = [recipeId];
@@ -34,7 +37,6 @@ const Recipe = {
     }
   },
 
-  // Update a recipe
   async update(recipeId, { title, description }) {
     const query = `
       UPDATE Recipes
@@ -55,7 +57,6 @@ const Recipe = {
     }
   },
 
-  // Delete a recipe
   async delete(recipeId) {
     const query = 'DELETE FROM Recipes WHERE recipe_id = $1 RETURNING *;';
     const values = [recipeId];
@@ -71,7 +72,6 @@ const Recipe = {
     }
   },
 
-  // List all recipes or by user
   async findAll({ userId } = {}) {
     let query = 'SELECT * FROM Recipes';
     const values = [];
