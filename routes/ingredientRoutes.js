@@ -3,8 +3,8 @@ const router = express.Router();
 const ingredientsController = require('../controllers/ingredientsController'); // Adjust the path as necessary
 const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
-// Adding a new ingredient to a recipe (protected)
-router.post('/ingredients', authenticate, ingredientsController.addIngredient);
+// Adjust the route for adding a new ingredient to include the recipeId
+router.post('/recipes/:recipeId/ingredients', authenticate, ingredientsController.addIngredient);
 
 // Updating an existing ingredient (protected)
 router.put('/ingredients/:ingredientId', authenticate, ingredientsController.updateIngredient);

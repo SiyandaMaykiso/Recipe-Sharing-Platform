@@ -2,7 +2,8 @@ const Ingredient = require('../models/ingredient'); // Adjust the path as necess
 
 // Add a new ingredient to a recipe
 exports.addIngredient = async (req, res) => {
-    const { recipeId, name, quantity } = req.body; // Assume these are provided in the request
+    const { recipeId } = req.params; // Extracting recipeId from URL parameters
+    const { name, quantity } = req.body; // Assume these are provided in the request
     try {
         const newIngredient = await Ingredient.create({ recipeId, name, quantity });
         res.status(201).json({ message: 'Ingredient added successfully', ingredient: newIngredient });
