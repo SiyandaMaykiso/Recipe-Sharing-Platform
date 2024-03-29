@@ -2,7 +2,7 @@
   "name": "recipe-sharing-platform",
   "version": "1.0.0",
   "description": "## Description This platform allows users to share their favorite recipes, including ingredients and cooking instructions. Users can also comment on and rate each other's recipes.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
