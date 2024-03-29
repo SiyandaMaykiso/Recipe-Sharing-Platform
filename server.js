@@ -1,42 +1,47 @@
-require('dotenv').config();
 const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Import the Sequelize models
-const { sequelize } = require('./models'); // Adjust the path according to your project structure
-
-// Middleware for parsing request bodies
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+const cors = require('cors');
+const dotenv = require('dotenv');
 
 // Import routes
-const userRoutes = require('./routes/userRoutes'); // Adjust the path as necessary
-const recipeRoutes = require('./routes/recipeRoutes'); // Ensure you have this file set up
-const ingredientRoutes = require('./routes/ingredientRoutes'); // Adjust path as necessary
+const userRoutes = require('./routes/userRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
+const ingredientRoutes = require('./routes/ingredientRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
 
-// Use routes with their respective prefixes
-app.use('/api/users', userRoutes);
-app.use('/api/recipes', recipeRoutes); // Include recipe routes in the server setup
-app.use('/api/ingredients', ingredientRoutes);
-app.use('/api/comments', commentRoutes);
-app.use('/api/ratings', ratingRoutes);
+// Initialize dotenv to use .env file variables
+dotenv.config();
 
-// Root route
+// Create Express app
+const app = express();
+
+// Middleware
+app.use(cors()); // Enables CORS for all requests. Customize as needed.
+app.use(express.json()); // Parses incoming requests with JSON payloads
+
+// Use routes
+app.use(userRoutes);
+app.use(recipeRoutes);
+app.use(ingredientRoutes);
+app.use(commentRoutes);
+app.use(ratingRoutes);
+
+// Default route for testing the server
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Recipe Sharing Platform API is running...');
 });
 
-// Check database connection and start server
-sequelize.authenticate()
-  .then(() => {
-    console.log('Database connected...');
-    console.log("JWT Secret Key:", process.env.JWT_SECRET); // Logging JWT Secret Key
-  })
-  .catch(err => console.log('Error: ' + err))
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Handle undefined routes with a 404 response
+app.use((req, res, next) => {
+  res.status(404).send('Sorry, that route does not exist.');
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

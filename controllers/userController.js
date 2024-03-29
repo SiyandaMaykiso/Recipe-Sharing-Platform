@@ -1,120 +1,98 @@
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const bcrypt = require('bcrypt');
+const User = require('../models/user'); // Adjust the path as necessary
 
+// User registration
 exports.register = async (req, res) => {
-  try {
     const { username, email, password } = req.body;
-    // Normalize and trim email and username
-    const normalizedEmail = email.trim().toLowerCase();
-    const trimmedUsername = username.trim();
+    try {
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
+            return res.status(409).json({ message: 'Email already in use' });
+        }
 
-    const userExists = await User.findOne({ where: { email: normalizedEmail } });
-    if (userExists) {
-      return res.status(400).json({ message: 'Email already in use' });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await User.create(username, email, hashedPassword);
+        res.status(201).json({ message: 'User created successfully', userId: newUser.user_id });
+    } catch (error) {
+        res.status(500).json({ message: 'Error registering new user', error: error.message });
     }
-    
-    const hashedPassword = await bcrypt.hash(password.trim(), 10);
-    const user = await User.create({
-      username: trimmedUsername,
-      email: normalizedEmail,
-      password: hashedPassword,
-    });
-    
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.status(201).json({
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
-      token,
-    });
-  } catch (error) {
-    console.error("Error registering new user:", error);
-    res.status(500).json({ message: 'Error registering new user' });
-  }
 };
 
+// User login with JWT
 exports.login = async (req, res) => {
-  try {
-    // Normalize and trim email
-    const email = req.body.email.trim().toLowerCase();
-    const password = req.body.password.trim();
+    const { email, password } = req.body;
+    try {
+        const user = await User.findByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
+
+        const token = jwt.sign(
+            { userId: user.user_id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+        res.status(500).json({ message: 'Error logging in', error: error.message });
+    }
+};
+
+// JWT Middleware for protected routes
+exports.authenticate = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided' });
     }
 
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      }
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ message: 'Token is not valid' });
+        req.user = user;
+        next();
     });
-  } catch (error) {
-    console.error("Error logging in:", error);
-    res.status(500).json({ message: "Error logging in" });
-  }
 };
 
+// Fetch user profile
 exports.getProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        // Exclude sensitive information like password
+        const { password, ...userInfo } = user;
+        res.json(userInfo);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user profile', error: error.message });
     }
-    res.json(user);
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).json({ message: "Error fetching user profile" });
-  }
 };
 
-exports.updateUserInfo = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { username, email } = req.body;
-    const normalizedEmail = email.trim().toLowerCase();
-    const trimmedUsername = username.trim();
-
-    const [numberOfAffectedRows] = await User.update(
-      { username: trimmedUsername, email: normalizedEmail },
-      { where: { id: userId } }
-    );
-
-    if (numberOfAffectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
+// Update user profile
+exports.updateProfile = async (req, res) => {
+    const { username, email } = req.body; // Example fields to update
+    try {
+        const updatedUser = await User.update(req.user.userId, { username, email });
+        res.json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating profile', error: error.message });
     }
+};
 
-    const updatedUser = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
-    res.status(200).json({ message: "User information updated successfully", user: updatedUser });
-  } catch (error) {
-    console.error("Error updating user information:", error);
-    res.status(500).json({ message: "Error updating user information" });
-  }
+// Delete user account
+exports.deleteAccount = async (req, res) => {
+    try {
+        await User.delete(req.user.userId);
+        res.status(204).send(); // No content to send back
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting account', error: error.message });
+    }
 };

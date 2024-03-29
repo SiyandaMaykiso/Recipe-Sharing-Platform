@@ -1,14 +1,15 @@
-// routes/ratingRoutes.js
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth'); // Import the authentication middleware
-const ratingsController = require('../controllers/ratingsController');
+const ratingsController = require('../controllers/ratingsController'); // Adjust the path as necessary
+const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
-// Apply the authMiddleware to routes that modify data
-router.post('/', authMiddleware, ratingsController.createRating); // Secure create operation
-router.get('/', ratingsController.getAllRatings); // Publicly accessible
-router.get('/:id', ratingsController.getRatingById); // Publicly accessible
-router.put('/:id', authMiddleware, ratingsController.updateRating); // Secure update operation
-router.delete('/:id', authMiddleware, ratingsController.deleteRating); // Secure delete operation
+// Add a new rating (protected)
+router.post('/ratings', authenticate, ratingsController.addRating);
+
+// Update a rating (protected)
+router.put('/ratings/:ratingId', authenticate, ratingsController.updateRating);
+
+// Get ratings for a recipe
+router.get('/recipes/:recipeId/ratings', ratingsController.getRatingsByRecipe);
 
 module.exports = router;

@@ -1,20 +1,22 @@
 const express = require('express');
+const { authenticate } = require('./middleware/auth'); // Correcting the path based on standard structure
+const userController = require('../controllers/userController'); // Adjust as necessary
+
 const router = express.Router();
-const authMiddleware = require('../middleware/auth'); // Ensure you have this middleware set up
-const userController = require('../controllers/userController'); // Adjust the path as necessary
 
-// Registration endpoint does not require authentication
-router.post('/register', userController.register);
+// Fetch user profile (Protected)
+router.get('/user/profile', authenticate, userController.getProfile);
 
-// Assuming you have a login endpoint (important for authentication)
-router.post('/login', userController.login);
+// Update user profile (Protected)
+router.put('/user/profile', authenticate, userController.updateProfile);
 
-// Example of a user profile route that requires authentication
-// This is a placeholder. Implement the corresponding method in your userController
-router.get('/profile', authMiddleware, userController.getProfile);
+// Delete user account (Protected)
+router.delete('/user/delete', authenticate, userController.deleteAccount);
 
-// Any other user-specific routes that require authentication
-// e.g., updating user information
-router.put('/update', authMiddleware, userController.updateUserInfo);
+// Existing protected route example
+// You can replace or remove this with actual routes you need
+router.get('/protected', authenticate, (req, res) => {
+    res.json({ message: 'Access to protected data', user: req.user });
+});
 
 module.exports = router;

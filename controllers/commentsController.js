@@ -1,71 +1,50 @@
-// controllers/commentsController.js
-const { Comment } = require('../models');
+const Comment = require('../models/comment'); // Adjust the path as necessary
 
-// Create a new comment
-exports.createComment = async (req, res) => {
-    const { commentText, recipeId, userId } = req.body;
+// Post a new comment
+exports.postComment = async (req, res) => {
+    const { recipeId, userId, commentText } = req.body; // Assume these are provided in the request
     try {
-        const comment = await Comment.create({ commentText, recipeId, userId });
-        res.status(201).json(comment);
+        const newComment = await Comment.create({ recipeId, userId, commentText });
+        res.status(201).json({ message: 'Comment posted successfully', comment: newComment });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ message: 'Error posting comment', error: error.message });
     }
 };
 
-// Fetch all comments
-exports.getAllComments = async (req, res) => {
-    try {
-        const comments = await Comment.findAll();
-        res.json(comments);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// Fetch a single comment by ID
-exports.getCommentById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const comment = await Comment.findByPk(id);
-        if (!comment) {
-            res.status(404).json({ message: "Comment not found" });
-        } else {
-            res.json(comment);
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// Update a comment by ID
+// Update an existing comment
 exports.updateComment = async (req, res) => {
-    const { id } = req.params;
-    const { commentText } = req.body;
+    const { commentId } = req.params;
+    const { commentText } = req.body; // Assume this is the field to update
     try {
-        const comment = await Comment.findByPk(id);
-        if (comment) {
-            comment.commentText = commentText;
-            await comment.save();
-            res.json(comment);
+        const updatedComment = await Comment.update(commentId, { commentText });
+        if (updatedComment) {
+            res.status(200).json({ message: 'Comment updated successfully', comment: updatedComment });
         } else {
-            res.status(404).json({ message: "Comment not found" });
+            res.status(404).json({ message: 'Comment not found' });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error updating comment', error: error.message });
     }
 };
 
-// Delete a comment by ID
+// Delete a comment
 exports.deleteComment = async (req, res) => {
-    const { id } = req.params;
+    const { commentId } = req.params;
     try {
-        const deleted = await Comment.destroy({ where: { id } });
-        if (deleted) {
-            res.status(204).send(); // Successfully deleted, no content to send back
-        } else {
-            res.status(404).json({ message: "Comment not found" });
-        }
+        await Comment.delete(commentId);
+        res.status(204).send(); // No content to send back upon successful deletion
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error deleting comment', error: error.message });
+    }
+};
+
+// Get all comments for a recipe
+exports.getCommentsByRecipe = async (req, res) => {
+    const { recipeId } = req.params;
+    try {
+        const comments = await Comment.findByRecipeId(recipeId);
+        res.status(200).json(comments);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving comments', error: error.message });
     }
 };

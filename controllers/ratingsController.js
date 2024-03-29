@@ -1,69 +1,39 @@
-// controllers/ratingsController.js
-const { Rating } = require('../models');
+const Rating = require('../models/rating'); // Adjust the path as necessary
 
-// Create a new rating
-exports.createRating = async (req, res) => {
-    const { userId, recipeId, rating } = req.body;
+// Add a new rating
+exports.addRating = async (req, res) => {
+    const { recipeId, userId, rating } = req.body; // Assume these are provided in the request
     try {
-        const newRating = await Rating.create({ userId, recipeId, rating });
-        res.status(201).json(newRating);
+        const newRating = await Rating.create({ recipeId, userId, rating });
+        res.status(201).json({ message: 'Rating added successfully', rating: newRating });
     } catch (error) {
-        res.status(500).json({ message: "Error creating rating", error: error.message });
+        res.status(500).json({ message: 'Error adding rating', error: error.message });
     }
 };
 
-// Fetch all ratings
-exports.getAllRatings = async (req, res) => {
-    try {
-        const ratings = await Rating.findAll();
-        res.json(ratings);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching ratings", error: error.message });
-    }
-};
-
-// Fetch a single rating by ID
-exports.getRatingById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const rating = await Rating.findByPk(id);
-        if (!rating) {
-            return res.status(404).json({ message: "Rating not found" });
-        }
-        res.json(rating);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching rating", error: error.message });
-    }
-};
-
-// Update a rating by ID
+// Update an existing rating
 exports.updateRating = async (req, res) => {
-    const { id } = req.params;
+    const { ratingId } = req.params;
     const { rating } = req.body;
     try {
-        const [updated] = await Rating.update({ rating }, { where: { id } });
-        if (updated) {
-            const updatedRating = await Rating.findByPk(id);
-            res.json(updatedRating);
+        const updatedRating = await Rating.update(ratingId, { rating });
+        if (updatedRating) {
+            res.status(200).json({ message: 'Rating updated successfully', rating: updatedRating });
         } else {
-            res.status(404).json({ message: "Rating not found" });
+            res.status(404).json({ message: 'Rating not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: "Error updating rating", error: error.message });
+        res.status(500).json({ message: 'Error updating rating', error: error.message });
     }
 };
 
-// Delete a rating by ID
-exports.deleteRating = async (req, res) => {
-    const { id } = req.params;
+// Get all ratings for a recipe
+exports.getRatingsByRecipe = async (req, res) => {
+    const { recipeId } = req.params;
     try {
-        const deleted = await Rating.destroy({ where: { id } });
-        if (deleted) {
-            res.status(204).send();
-        } else {
-            res.status(404).json({ message: "Rating not found" });
-        }
+        const ratings = await Rating.findByRecipeId(recipeId);
+        res.status(200).json(ratings);
     } catch (error) {
-        res.status(500).json({ message: "Error deleting rating", error: error.message });
+        res.status(500).json({ message: 'Error retrieving ratings', error: error.message });
     }
 };

@@ -1,14 +1,18 @@
-// routes/commentRoutes.js
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth'); // Import the authentication middleware
-const commentsController = require('../controllers/commentsController');
+const commentsController = require('../controllers/commentsController'); // Adjust the path as necessary
+const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
-// Apply the authMiddleware to routes that modify data
-router.post('/', authMiddleware, commentsController.createComment); // Secure create operation
-router.get('/', commentsController.getAllComments); // Publicly accessible
-router.get('/:id', commentsController.getCommentById); // Publicly accessible
-router.put('/:id', authMiddleware, commentsController.updateComment); // Secure update operation
-router.delete('/:id', authMiddleware, commentsController.deleteComment); // Secure delete operation
+// Post a new comment (protected)
+router.post('/comments', authenticate, commentsController.postComment);
+
+// Update an existing comment (protected)
+router.put('/comments/:commentId', authenticate, commentsController.updateComment);
+
+// Delete a comment (protected)
+router.delete('/comments/:commentId', authenticate, commentsController.deleteComment);
+
+// Get all comments for a specific recipe
+router.get('/recipes/:recipeId/comments', commentsController.getCommentsByRecipe);
 
 module.exports = router;
