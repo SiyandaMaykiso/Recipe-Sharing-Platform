@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -13,16 +12,19 @@ function App() {
     ingredients: [{ name: '', quantity: '' }],
   };
 
-  // Function that submits the form data to your backend
-  const handleRecipeFormSubmit = async (values) => {
+  // Function that submits the form data to your backend securely
+  const handleRecipeFormSubmit = async (values, setFormError) => {
     try {
-      // Make sure to replace 'http://localhost:3000/recipes' with your actual backend endpoint
+      // Retrieve the JWT token from local storage
+      const token = localStorage.getItem('token');
+
+      // Ensure you replace 'http://localhost:3000/recipes' with your actual backend endpoint
       const response = await fetch('http://localhost:3000/recipes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // Include the Authorization header with the token if your endpoint requires authentication
-          // 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+          'Authorization': `Bearer ${token || ''}`, // Securely include the JWT token in the request
         },
         body: JSON.stringify(values),
       });
@@ -35,10 +37,14 @@ function App() {
 
       const recipe = await response.json();
       console.log('Recipe created successfully', recipe);
-      // Handle successful recipe creation, e.g., redirecting the user or showing a success message
+      // Optionally: Redirect the user or show a success message here
     } catch (error) {
       console.error('Failed to create recipe:', error);
-      // Handle errors, e.g., showing an error message to the user
+      if (setFormError) {
+        // Communicate back any error to the form for user feedback
+        setFormError(error.message || 'An unexpected error occurred. Please try again.');
+      }
+      // Optionally: Show an error message to the user here
     }
   };
 
@@ -53,10 +59,14 @@ function App() {
               <RecipeForm
                 {...props}
                 initialValues={recipeFormInitialValues}
-                onSubmit={handleRecipeFormSubmit}
+                onSubmit={(values, { setSubmitting, setStatus }) => {
+                  // Adjusting form submission to handle async operation and error feedback
+                  handleRecipeFormSubmit(values, setStatus).finally(() => setSubmitting(false));
+                }}
               />
             )}
           />
+          {/* Define other routes as needed */}
         </Switch>
       </AuthProvider>
     </Router>

@@ -1,29 +1,36 @@
 // src/components/RecipeForm.js
-import React from 'react';
+import React, { useState } from 'react'; // Make sure to import useState
 import { Formik, Form, Field, FieldArray } from 'formik';
 
 const RecipeForm = ({ initialValues, onSubmit }) => {
+  // State for managing submission errors
+  const [submissionError, setSubmissionError] = useState('');
+
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={(values, { setSubmitting }) => {
-        onSubmit(values);
-        setSubmitting(false);
+      onSubmit={async (values, { setSubmitting }) => {
+        try {
+          // Clear previous submission errors
+          setSubmissionError('');
+          await onSubmit(values);
+        } catch (error) {
+          // Set new submission error if onSubmit fails
+          setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
+        } finally {
+          // Always stop submitting, regardless of outcome
+          setSubmitting(false);
+        }
       }}
       // Add validation schema here if needed
     >
-      {({ values, isSubmitting, handleChange }) => (
+      {({ values, isSubmitting }) => (
         <Form>
           <label htmlFor="title">Title</label>
           <Field id="title" name="title" placeholder="Chocolate Cake" />
 
           <label htmlFor="description">Description</label>
-          <Field
-            id="description"
-            name="description"
-            as="textarea"
-            placeholder="Delicious chocolate cake..."
-          />
+          <Field id="description" name="description" as="textarea" placeholder="Delicious chocolate cake..." />
 
           <FieldArray name="ingredients">
             {({ insert, remove, push }) => (
@@ -34,24 +41,19 @@ const RecipeForm = ({ initialValues, onSubmit }) => {
                     <div key={index}>
                       <Field name={`ingredients.${index}.name`} placeholder="Flour" />
                       <Field name={`ingredients.${index}.quantity`} placeholder="2 cups" />
-                      <button type="button" onClick={() => remove(index)}>
-                        -
-                      </button>
-                      <button type="button" onClick={() => push({ name: '', quantity: '' })}>
-                        +
-                      </button>
+                      <button type="button" onClick={() => remove(index)}>-</button>
+                      <button type="button" onClick={() => push({ name: '', quantity: '' })}>+</button>
                     </div>
                   ))}
-                <button type="button" onClick={() => push({ name: '', quantity: '' })}>
-                  Add Ingredient
-                </button>
+                <button type="button" onClick={() => push({ name: '', quantity: '' })}>Add Ingredient</button>
               </div>
             )}
           </FieldArray>
 
-          <button type="submit" disabled={isSubmitting}>
-            Submit
-          </button>
+          {/* Display the submission error message */}
+          {submissionError && <div style={{ color: 'red', marginTop: '10px' }}>{submissionError}</div>}
+
+          <button type="submit" disabled={isSubmitting}>Submit</button>
         </Form>
       )}
     </Formik>
