@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
 import RecipeForm from './components/RecipeForm';
 import Home from './components/Home'; // Import the Home component
+import Login from './components/Login'; // Import Login
+import Registration from './components/Registration'; // Import Registration
 
 function App() {
   const recipeFormInitialValues = {
@@ -17,7 +19,7 @@ function App() {
       // Retrieve the JWT token from local storage
       const token = localStorage.getItem('token');
 
-      // Ensure you replace 'http://localhost:3000/recipes' with your actual backend endpoint
+      // Replace 'http://localhost:3000/recipes' with your actual backend endpoint
       const response = await fetch('http://localhost:3000/recipes', {
         method: 'POST',
         headers: {
@@ -36,36 +38,30 @@ function App() {
 
       const recipe = await response.json();
       console.log('Recipe created successfully', recipe);
-      // Optionally: Redirect the user or show a success message here
+      // Optionally: Redirect the user or show a success message
     } catch (error) {
       console.error('Failed to create recipe:', error);
       if (setFormError) {
         // Communicate back any error to the form for user feedback
         setFormError(error.message || 'An unexpected error occurred. Please try again.');
       }
-      // Optionally: Show an error message to the user here
     }
   };
 
-  rreturn (
+  return (
     <Router>
       <AuthProvider>
         <Routes>
           <Route path="/user" element={<UserProfile />} />
           <Route path="/add-recipe" element={
-            <RecipeForm 
-              initialValues={{
-                title: '',
-                description: '',
-                ingredients: [{ name: '', quantity: '' }],
-              }} 
-              onSubmit={async (values, setFormError) => {
-                // Your form submission logic...
-              }} 
-            />
-          } />
-          <Route path="/" element={<Home />} /> {/* Add the Home route */}
-          {/* You can define other routes here as needed */}
+  <RecipeForm 
+    initialValues={recipeFormInitialValues} 
+    onSubmit={handleRecipeFormSubmit} 
+  />
+} />
+          <Route path="/login" element={<Login />} /> {/* Add Login route */}
+          <Route path="/register" element={<Registration />} /> {/* Add Registration route */}
+          <Route path="/" element={<Home />} />
         </Routes>
       </AuthProvider>
     </Router>
