@@ -2,7 +2,8 @@ const Rating = require('../models/rating'); // Adjust the path as necessary
 
 // Add a new rating
 exports.addRating = async (req, res) => {
-    const { recipeId, userId, rating } = req.body; // Assume these are provided in the request
+    const { recipeId } = req.params; // Extracting recipeId from URL parameters
+    const { userId, rating } = req.body; // Extracting userId and rating from the request body
     try {
         const newRating = await Rating.create({ recipeId, userId, rating });
         res.status(201).json({ message: 'Rating added successfully', rating: newRating });
@@ -10,6 +11,7 @@ exports.addRating = async (req, res) => {
         res.status(500).json({ message: 'Error adding rating', error: error.message });
     }
 };
+
 
 // Update an existing rating
 exports.updateRating = async (req, res) => {
