@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import UserProfile from './components/UserProfile';
+import RecipeForm from './components/RecipeForm'; // Import the RecipeForm component
 
 function App() {
+  // Define initial form values for the RecipeForm
+  const recipeFormInitialValues = {
+    title: '',
+    description: '',
+    ingredients: [{ name: '', quantity: '' }],
+  };
+
+  // Define a dummy handleSubmit function for the RecipeForm
+  // In a real app, you would replace this with a function that submits the form data to your backend
+  const handleRecipeFormSubmit = (values) => {
+    console.log('Form values:', values);
+    // Add your submission logic here
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <AuthProvider>
+        <Switch>
+          <Route path="/user" component={UserProfile} />
+          {/* Add a new Route for the RecipeForm */}
+          <Route
+            path="/add-recipe"
+            render={(props) => (
+              <RecipeForm
+                {...props}
+                initialValues={recipeFormInitialValues}
+                onSubmit={handleRecipeFormSubmit}
+              />
+            )}
+          />
+          {/* Define other routes as needed */}
+        </Switch>
+      </AuthProvider>
+    </Router>
   );
 }
 
