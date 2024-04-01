@@ -13,11 +13,33 @@ function App() {
     ingredients: [{ name: '', quantity: '' }],
   };
 
-  // Define a dummy handleSubmit function for the RecipeForm
-  // In a real app, you would replace this with a function that submits the form data to your backend
-  const handleRecipeFormSubmit = (values) => {
-    console.log('Form values:', values);
-    // Add your submission logic here
+  // Function that submits the form data to your backend
+  const handleRecipeFormSubmit = async (values) => {
+    try {
+      // Make sure to replace 'http://localhost:3000/recipes' with your actual backend endpoint
+      const response = await fetch('http://localhost:3000/recipes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Include the Authorization header with the token if your endpoint requires authentication
+          // 'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        // Convert non-2xx HTTP responses into errors
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create recipe');
+      }
+
+      const recipe = await response.json();
+      console.log('Recipe created successfully', recipe);
+      // Handle successful recipe creation, e.g., redirecting the user or showing a success message
+    } catch (error) {
+      console.error('Failed to create recipe:', error);
+      // Handle errors, e.g., showing an error message to the user
+    }
   };
 
   return (
@@ -25,7 +47,6 @@ function App() {
       <AuthProvider>
         <Switch>
           <Route path="/user" component={UserProfile} />
-          {/* Add a new Route for the RecipeForm */}
           <Route
             path="/add-recipe"
             render={(props) => (
@@ -36,7 +57,6 @@ function App() {
               />
             )}
           />
-          {/* Define other routes as needed */}
         </Switch>
       </AuthProvider>
     </Router>
