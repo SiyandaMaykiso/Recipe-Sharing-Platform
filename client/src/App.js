@@ -1,18 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
-import RecipeForm from './components/RecipeForm'; // Import the RecipeForm component
+import RecipeForm from './components/RecipeForm';
+import Home from './components/Home'; // Import the Home component
 
 function App() {
-  // Define initial form values for the RecipeForm
   const recipeFormInitialValues = {
     title: '',
     description: '',
     ingredients: [{ name: '', quantity: '' }],
   };
 
-  // Function that submits the form data to your backend securely
   const handleRecipeFormSubmit = async (values, setFormError) => {
     try {
       // Retrieve the JWT token from local storage
@@ -48,26 +47,26 @@ function App() {
     }
   };
 
-  return (
+  rreturn (
     <Router>
       <AuthProvider>
-        <Switch>
-          <Route path="/user" component={UserProfile} />
-          <Route
-            path="/add-recipe"
-            render={(props) => (
-              <RecipeForm
-                {...props}
-                initialValues={recipeFormInitialValues}
-                onSubmit={(values, { setSubmitting, setStatus }) => {
-                  // Adjusting form submission to handle async operation and error feedback
-                  handleRecipeFormSubmit(values, setStatus).finally(() => setSubmitting(false));
-                }}
-              />
-            )}
-          />
-          {/* Define other routes as needed */}
-        </Switch>
+        <Routes>
+          <Route path="/user" element={<UserProfile />} />
+          <Route path="/add-recipe" element={
+            <RecipeForm 
+              initialValues={{
+                title: '',
+                description: '',
+                ingredients: [{ name: '', quantity: '' }],
+              }} 
+              onSubmit={async (values, setFormError) => {
+                // Your form submission logic...
+              }} 
+            />
+          } />
+          <Route path="/" element={<Home />} /> {/* Add the Home route */}
+          {/* You can define other routes here as needed */}
+        </Routes>
       </AuthProvider>
     </Router>
   );
