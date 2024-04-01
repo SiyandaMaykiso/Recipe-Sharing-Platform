@@ -4,10 +4,10 @@ const ratingsController = require('../controllers/ratingsController'); // Adjust
 const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
 // Add a new rating (protected)
-router.post('/ratings', authenticate, ratingsController.addRating);
+router.post('/recipes/:recipeId/ratings', authenticate, ratingsController.addRating);
 
 // Update a rating (protected)
-router.put('/ratings/:ratingId', authenticate, ratingsController.updateRating);
+router.put('/recipes/:recipeId/ratings/:ratingId', authenticate, ratingsController.updateRating);
 
 // Get ratings for a recipe
 router.get('/recipes/:recipeId/ratings', ratingsController.getRatingsByRecipe);

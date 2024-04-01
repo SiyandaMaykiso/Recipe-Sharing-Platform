@@ -7,10 +7,10 @@ const { authenticate } = require('../middleware/auth'); // Assuming auth middlew
 router.post('/recipes/:recipeId/ingredients', authenticate, ingredientsController.addIngredient);
 
 // Updating an existing ingredient (protected)
-router.put('/ingredients/:ingredientId', authenticate, ingredientsController.updateIngredient);
+router.put('/recipes/:recipeId/ingredients/:ingredientId', authenticate, ingredientsController.updateIngredient);
 
 // Deleting an ingredient (protected)
-router.delete('/ingredients/:ingredientId', authenticate, ingredientsController.deleteIngredient);
+router.delete('/recipes/:recipeId/ingredients/:ingredientId', authenticate, ingredientsController.deleteIngredient);
 
 // Getting all ingredients for a specific recipe
 router.get('/recipes/:recipeId/ingredients', ingredientsController.getIngredientsByRecipe);
