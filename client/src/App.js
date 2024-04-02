@@ -1,3 +1,4 @@
+import './App.css'; // Add this line at the top of your App.js file
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';

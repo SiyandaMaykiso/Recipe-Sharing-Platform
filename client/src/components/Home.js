@@ -7,11 +7,13 @@ const Home = () => {
   return (
     <div className="home-container">
       <h1>Welcome to the Recipe Sharing Platform!</h1>
-      <div className="forms-container">
-        <div className="login-form">
+      {/* Use "forms-wrapper" as per the CSS */}
+      <div className="forms-wrapper"> 
+        {/* Use "form-container" for individual forms to apply the CSS correctly */}
+        <div className="form-container"> 
           <Login /> {/* Embed the Login form */}
         </div>
-        <div className="registration-form">
+        <div className="form-container">
           <Registration /> {/* Embed the Registration form */}
         </div>
       </div>
