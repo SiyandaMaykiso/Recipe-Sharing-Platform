@@ -17,11 +17,7 @@ const User = {
     const values = [email];
     try {
       const { rows } = await db.query(query, values);
-      if (rows.length > 0) {
-        return rows[0];
-      } else {
-        return null; // No user found with this email
-      }
+      return rows[0];
     } catch (error) {
       throw error;
     }
@@ -32,11 +28,7 @@ const User = {
     const values = [userId];
     try {
       const { rows } = await db.query(query, values);
-      if (rows.length > 0) {
-        return rows[0]; // Return the user found
-      } else {
-        return null; // No user found with this ID
-      }
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('Error fetching user by ID:', error);
       throw error;
@@ -44,27 +36,28 @@ const User = {
   },
 
   async update(userId, { username, email }) {
-    const query = `
-      UPDATE Users
-      SET username = $1, email = $2
-      WHERE user_id = $3
-      RETURNING *;
-    `;
+    const query = 'UPDATE Users SET username = $1, email = $2 WHERE user_id = $3 RETURNING *';
     const values = [username, email, userId];
     try {
       const { rows } = await db.query(query, values);
-      if (rows.length > 0) {
-        return rows[0]; // Assuming IDs are unique, there should only be one row for the updated user
-      } else {
-        return null; // No user found with this ID, or no update was made
-      }
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      console.error('Error updating user:', error);
       throw error;
     }
   },
 
-  // You can add more methods as needed for your user management
+  async delete(userId) {
+    const query = 'DELETE FROM Users WHERE user_id = $1';
+    const values = [userId];
+    try {
+      await db.query(query, values);
+      // No return value needed as deletion does not return a row
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  },
 };
 
 module.exports = User;
