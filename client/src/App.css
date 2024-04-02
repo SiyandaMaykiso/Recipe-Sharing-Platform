@@ -28,6 +28,31 @@ body {
   text-align: center;
 }
 
+.ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between each ingredient field */
+}
+
+.ingredient-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ingredient-input {
+  padding: 10px;
+  font-size: 16px; /* Larger font size for readability */
+  width: 100%; /* Full width within its container */
+  margin-bottom: 5px;
+}
+
+.ingredient-actions {
+  display: flex;
+  gap: 5px; /* Space between action buttons */
+}
+
+
 .main-header {
   display: flex;
   justify-content: space-between;
