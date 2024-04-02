@@ -17,8 +17,29 @@ const User = {
     const values = [email];
     try {
       const { rows } = await db.query(query, values);
-      return rows[0];
+      if (rows.length > 0) {
+        return rows[0];
+      } else {
+        return null; // No user found with this email
+      }
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // Method to find a user by their ID
+  async findById(userId) {
+    const query = 'SELECT * FROM Users WHERE user_id = $1';
+    const values = [userId];
+    try {
+      const { rows } = await db.query(query, values);
+      if (rows.length > 0) {
+        return rows[0]; // Return the user found
+      } else {
+        return null; // No user found with this ID
+      }
+    } catch (error) {
+      console.error('Error fetching user by ID:', error);
       throw error;
     }
   },
