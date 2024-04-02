@@ -1,12 +1,13 @@
-import './App.css'; // Add this line at the top of your App.js file
+import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
 import RecipeForm from './components/RecipeForm';
-import Home from './components/Home'; // Import the Home component
-import Login from './components/Login'; // Import Login
-import Registration from './components/Registration'; // Import Registration
+import Home from './components/Home';
+import Login from './components/Login';
+import Registration from './components/Registration';
+import Dashboard from './components/Dashboard'; // Make sure this line is added to import the Dashboard
 
 function App() {
   const recipeFormInitialValues = {
@@ -54,15 +55,11 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/user" element={<UserProfile />} />
-          <Route path="/add-recipe" element={
-  <RecipeForm 
-    initialValues={recipeFormInitialValues} 
-    onSubmit={handleRecipeFormSubmit} 
-  />
-} />
-          <Route path="/login" element={<Login />} /> {/* Add Login route */}
-          <Route path="/register" element={<Registration />} /> {/* Add Registration route */}
+          <Route path="/add-recipe" element={<RecipeForm initialValues={recipeFormInitialValues} onSubmit={handleRecipeFormSubmit} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} /> {/* Add this line for the Dashboard route */}
         </Routes>
       </AuthProvider>
     </Router>
