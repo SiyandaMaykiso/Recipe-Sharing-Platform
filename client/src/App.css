@@ -155,6 +155,33 @@ body {
   color: #E95536; /* Use primary color for titles */
 }
 
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers children horizontally in the container */
+  justify-content: center; /* Centers children vertically in the container */
+}
+
+/* Text Alignment */
+.dashboard {
+  text-align: center;
+}
+
+.dashboard h1, .dashboard h2 {
+  text-align: center;
+}
+
+.dashboard h1 {
+  font-size: 24px; /* Example size */
+  font-weight: bold;
+}
+
+.dashboard li {
+  text-align: left; /* or "justify" for justified text */
+  margin-bottom: 10px; /* Adds space between list items */
+  padding: 5px; /* Adds space inside each list item */
+}
+
 .dashboard,
 .recipe-form-container {
   margin: auto;
@@ -165,6 +192,29 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+.dashboard p {
+  font-size: 16px; /* Example size */
+  font-weight: normal;
+}
+
+/* Target the list items directly to style the content within */
+.dashboard ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0; /* Add some vertical padding for spacing */
+}
+
+/* Specific styles for the title and buttons container to ensure they are spaced out */
+.dashboard ul li > div:first-child,
+.dashboard ul li > div:last-child {
+  flex: 1;
+}
+
+/* Ensuring the buttons have some spacing between them */
+.dashboard ul li button {
+  margin-left: 10px; /* Add space to the left of buttons */
+}
 
 /* New styles for centering forms */
 .home-container, .forms-wrapper {
@@ -217,3 +267,15 @@ body {
     padding: 1rem;
   }
 }
+
+/* Add space after the submit button */
+.recipe-form-container button[type="submit"] {
+  margin-bottom: 20px; /* Adjust the space as needed */
+}
+
+/* Alternatively, if the "Back to Dashboard" is a link styled as a button, you can target it directly if it has a specific class, or generically like this: */
+.recipe-form-container a.button-link {
+  display: block; /* Makes it take the full width, ensuring it starts on a new line */
+  margin-top: 20px; /* Adds space above it */
+}
+
