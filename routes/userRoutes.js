@@ -19,4 +19,11 @@ router.put('/user/profile', authenticate, userController.updateProfile);
 // Delete user account (Protected)
 router.delete('/user/delete', authenticate, userController.deleteAccount);
 
+// A sample protected route that checks for a valid JWT token
+router.get('/protected', authenticate, (req, res) => {
+    res.json({ message: 'Access to protected data', user: req.user });
+});
+
+module.exports = router;
+
 module.exports = router;

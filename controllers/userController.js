@@ -54,9 +54,9 @@ exports.authenticate = (req, res, next) => {
         return res.status(401).json({ message: 'No token provided' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(403).json({ message: 'Token is not valid' });
-        req.user = user;
+        req.user = decoded;
         next();
     });
 };
@@ -68,8 +68,7 @@ exports.getProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        // Exclude sensitive information like password
-        const { password, ...userInfo } = user;
+        const { password, ...userInfo } = user; // Exclude password from the response
         res.json(userInfo);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user profile', error: error.message });
@@ -77,15 +76,36 @@ exports.getProfile = async (req, res) => {
 };
 
 // Update user profile
+// Update user profile
 exports.updateProfile = async (req, res) => {
-    const { username, email } = req.body; // Example fields to update
+    const userId = req.user.userId;
+    const { username, email } = req.body;
+
     try {
-        const updatedUser = await User.update(req.user.userId, { username, email });
-        res.json({ message: 'Profile updated successfully', user: updatedUser });
+        // Ensure we don't attempt to update fields to null if they're not provided
+        let updateFields = {};
+        if (username !== undefined) {
+            updateFields.username = username;
+        }
+        if (email !== undefined) {
+            updateFields.email = email;
+        }
+
+        const updatedUser = await User.update(userId, updateFields);
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Exclude sensitive information like password from the response
+        const { password, ...userInfoWithoutPassword } = updatedUser;
+        
+        res.json({ message: 'Profile updated successfully', user: userInfoWithoutPassword });
     } catch (error) {
         res.status(500).json({ message: 'Error updating profile', error: error.message });
     }
 };
+
 
 // Delete user account
 exports.deleteAccount = async (req, res) => {
