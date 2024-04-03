@@ -3,87 +3,129 @@ import { useParams } from 'react-router-dom';
 
 const RecipeDetail = () => {
   const { id } = useParams();
-  const [recipe, setRecipe] = useState(null);
+  const [recipe, setRecipe] = useState({});
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [newRating, setNewRating] = useState(0); // Initialize rating as 0
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchRecipeDetails = async () => {
-      const recipeResponse = await fetch(`http://localhost:3000/recipes/${id}`);
-      const recipeData = await recipeResponse.json();
-      setRecipe(recipeData);
-    };
+    async function fetchData() {
+      try {
+        const recipeRes = await fetch(`http://localhost:3000/recipes/${id}`);
+        if (!recipeRes.ok) throw new Error('Failed to fetch recipe details');
+        const recipeData = await recipeRes.json();
+        setRecipe(recipeData);
 
-    const fetchComments = async () => {
-        try {
-          const commentsResponse = await fetch(`http://localhost:3000/recipes/${id}/comments`);
-          if (!commentsResponse.ok) {
-            throw new Error('Failed to fetch comments');
-          }
-          const commentsData = await commentsResponse.json();
-          setComments(commentsData); // Assume commentsData is an array
-        } catch (error) {
-          console.error("Error fetching comments:", error);
-          setComments([]); // Ensure comments is reset to an empty array on error
-        }
-    };
-
-    fetchRecipeDetails();
-    fetchComments();
+        const commentsRes = await fetch(`http://localhost:3000/recipes/${id}/comments`);
+        if (!commentsRes.ok) throw new Error('Failed to fetch comments');
+        const commentsData = await commentsRes.json();
+        setComments(commentsData);
+      } catch (error) {
+        setError(error.message);
+      }
+    }
+    fetchData();
   }, [id]);
-
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+  
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('authToken'); // Updated to use 'authToken'
+    console.log("Token:", token); // Log the token to the console
+  
+    if (!token) {
+      console.error("No authentication token found");
+      setError("You must be logged in to post a comment.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:3000/recipes/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Correctly include the token in the Authorization header
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: newComment }),
+      });
+  
+      if (!response.ok) {
+        const errorResponse = await response.json(); // Assuming the error details are in JSON format
+        throw new Error(`Failed to post new comment: ${errorResponse.message}`);
+      }
+      const addedComment = await response.json();
+      setComments([...comments, addedComment]);
+      setNewComment(''); // Clear the input field
+    } catch (error) {
+      console.error("Error posting new comment:", error.message);
+      setError(error.message); // Set the error state to display the message
+    }
+  };
+  
+  const handleRatingSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Retrieve the token from localStorage for the rating submission
+    const token = localStorage.getItem('authToken'); // Updated to use 'authToken'
+    console.log("Token for rating:", token); // Log the token to the console for rating
+  
+    try {
+      const response = await fetch(`http://localhost:3000/recipes/${id}/ratings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+        body: JSON.stringify({ rating: newRating }),
+      });
 
-    // Assuming you have a backend endpoint to handle POST requests for adding a comment
-    const commentResponse = await fetch(`http://localhost:3000/recipes/${id}/comments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Include authorization header if your endpoint requires authentication
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({
-        content: newComment,
-        // You might need to include additional fields as required by your backend, like userId
-      }),
-    });
-
-    if (commentResponse.ok) {
-      setNewComment(''); // Reset comment input field
-      // Refresh comments to include the new comment
-      const updatedCommentsResponse = await fetch(`http://localhost:3000/recipes/${id}/comments`);
-      const updatedCommentsData = await updatedCommentsResponse.json();
-      setComments(updatedCommentsData);
-    } else {
-      // Handle error case
-      console.error('Failed to post comment');
+      if (!response.ok) throw new Error('Failed to post new rating');
+      // Fetch updated ratings here if necessary
+      setNewRating(0); // Reset rating input
+    } catch (error) {
+      setError(error.message);
     }
   };
 
-  if (!recipe) {
-    return <p>Loading recipe...</p>;
-  }
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
       <h2>{recipe.title}</h2>
-      {/* Display other recipe details like ingredients and description here */}
+      <p>{recipe.description}</p>
+      {/* Display more recipe details here */}
 
+      <h3>Comments</h3>
+      {comments.map((comment, index) => (
+        <div key={index}>
+          <p>{comment.content}</p>
+        </div>
+      ))}
+
+      <form onSubmit={handleCommentSubmit}>
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Leave a comment"
+        />
+        <button type="submit">Post Comment</button>
+      </form>
+
+      {/* Rating submission section */}
       <div>
-        <h3>Comments</h3>
-        {comments.map((comment, index) => (
-          <div key={index}>
-            <p>{comment.author}: {comment.content}</p>
-          </div>
-        ))}
-        <form onSubmit={handleCommentSubmit}>
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Leave a comment"
+        <h3>Rate this recipe</h3>
+        <form onSubmit={handleRatingSubmit}>
+          <input
+            type="number"
+            min="1"
+            max="5"
+            value={newRating}
+            onChange={(e) => setNewRating(e.target.value)}
+            placeholder="Rate 1-5"
           />
-          <button type="submit">Post Comment</button>
+          <button type="submit">Submit Rating</button>
         </form>
       </div>
     </div>
