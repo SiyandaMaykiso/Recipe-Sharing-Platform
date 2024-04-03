@@ -9,7 +9,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -18,22 +18,24 @@ function Login() {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       if (!response.ok) {
-        // If login is not successful, throw an error with the status text or a custom message
         throw new Error(response.statusText || 'Login failed');
       }
-
+  
       const data = await response.json();
-      // Assuming the token is returned in data.token
-      localStorage.setItem('authToken', data.token); // Save the token in localStorage
-
-      navigate('/dashboard'); // Redirect to a 'dashboard' or another route on successful login
+      localStorage.setItem('token', data.token); // Use 'token' as the key for consistency
+  
+      // Optionally: Save user details in local storage if the backend also returns user data
+      localStorage.setItem('user', JSON.stringify(data.user));
+  
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError('Failed to login. Please check your credentials.'); // Set login error message
+      setLoginError('Failed to login. Please check your credentials.');
     }
   };
+  
 
   return (
     <div>

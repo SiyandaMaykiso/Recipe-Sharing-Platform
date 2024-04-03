@@ -9,11 +9,10 @@ export function useAuth() {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
-  // Directly initialize authToken from localStorage, if available
   const [authToken, setAuthToken] = useState(localStorage.getItem('token') || '');
 
   useEffect(() => {
-    // Update localStorage when authToken or currentUser changes
+    // Sync authToken and currentUser with localStorage
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(currentUser));
   }, [authToken, currentUser]);
@@ -33,8 +32,11 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      setCurrentUser(data.user); // Assuming the backend returns the user's data and token
-      setAuthToken(data.token); // Store the token in state and localStorage is handled by useEffect
+      setCurrentUser(data.user); // Update state with the user's information
+      setAuthToken(data.token); // Update state with the authentication token
+      // Also directly update localStorage to ensure it's immediately available
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -42,14 +44,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Clear user info from state and local storage
     setCurrentUser(null);
     setAuthToken('');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
 
-  // Function to construct auth header with the token
   const getAuthHeader = () => {
+    // Helper function to get the auth header
     return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
   };
 
@@ -57,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     login,
     logout,
-    getAuthHeader, // Include getAuthHeader to provide Authorization headers for authenticated requests
+    getAuthHeader,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
