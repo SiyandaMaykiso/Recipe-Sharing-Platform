@@ -39,7 +39,14 @@ exports.login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.status(200).json({ message: 'Login successful', token });
+        // Exclude password and any other sensitive info from the response
+        const { password: userPassword, ...userInfo } = user;
+
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: userInfo // Include user info in the response
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }

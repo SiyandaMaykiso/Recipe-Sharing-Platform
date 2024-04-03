@@ -8,6 +8,8 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Registration from './components/Registration';
 import Dashboard from './components/Dashboard'; // Make sure this line is added to import the Dashboard
+import RecipeDetail from './components/RecipeDetail'; // Import your RecipeDetail component
+import RecipeListings from './components/RecipeListings'; // Import the component
 
 function App() {
   const recipeFormInitialValues = {
@@ -60,6 +62,8 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} /> {/* Add this line for the Dashboard route */}
+          <Route path="/recipes" element={<RecipeListings />} />
+          <Route path="/recipes/:id" element={<RecipeDetail />} />
         </Routes>
       </AuthProvider>
     </Router>

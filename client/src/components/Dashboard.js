@@ -77,6 +77,7 @@ const Dashboard = () => {
     <div className="dashboard">
       <h1>Recipes</h1>
       <Link to="/add-recipe" className="add-recipe-button">Add New Recipe</Link>
+      <Link to="/recipes" className="view-recipes-button">View Recipes</Link>
       {isEditing ? (
         <div>
           <input type="text" name="title" value={editFormData.title} onChange={handleEditFormChange} />

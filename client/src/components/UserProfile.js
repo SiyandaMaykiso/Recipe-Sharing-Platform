@@ -1,34 +1,32 @@
 // src/components/UserProfile.js
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-function UserProfile() {
+const UserProfile = () => {
   const { currentUser, logout } = useAuth();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login'); // Redirect the user to the login page after logout
+      navigate('/login'); // Redirect to login page after logout
     } catch (error) {
-      // Handle potential errors (e.g., failed logout process)
-      console.error('Failed to logout', error);
+      console.error('Logout failed', error);
     }
   };
 
+  if (!currentUser) {
+    return <div>Please log in to view this page.</div>;
+  }
+
   return (
     <div>
-      {currentUser ? (
-        <>
-          <h1>Welcome, {currentUser.email}</h1>
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <h1>Please log in</h1>
-      )}
+      <h1>User Profile</h1>
+      <p>Email: {currentUser.email}</p>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
-}
+};
 
 export default UserProfile;

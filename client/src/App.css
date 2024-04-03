@@ -155,6 +155,34 @@ body {
   color: #E95536; /* Use primary color for titles */
 }
 
+.recipe-listings .recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.recipe-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.recipe-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.recipe-card h3 {
+  padding: 0 20px;
+}
+
+.recipe-card p {
+  padding: 0 20px 20px;
+}
+
 .dashboard {
   display: flex;
   flex-direction: column;

@@ -42,10 +42,12 @@ exports.deleteComment = async (req, res) => {
 // Get all comments for a recipe
 exports.getCommentsByRecipe = async (req, res) => {
     const { recipeId } = req.params;
+    console.log("Fetching comments for recipe ID:", recipeId); // Diagnostic log
     try {
         const comments = await Comment.findByRecipeId(recipeId);
         res.status(200).json(comments);
     } catch (error) {
+        console.error("Error retrieving comments for recipe ID:", recipeId, error); // Detailed error log
         res.status(500).json({ message: 'Error retrieving comments', error: error.message });
     }
 };
