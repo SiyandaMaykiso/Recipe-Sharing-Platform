@@ -4,7 +4,7 @@ const commentsController = require('../controllers/commentsController'); // Adju
 const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
 
 // Post a new comment (protected)
-router.post('/comments', authenticate, commentsController.postComment);
+router.post('/recipes/:recipeId/comments', authenticate, commentsController.postComment);
 
 // Update an existing comment (protected)
 router.put('/comments/:commentId', authenticate, commentsController.updateComment);

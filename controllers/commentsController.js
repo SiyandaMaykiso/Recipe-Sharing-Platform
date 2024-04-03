@@ -2,14 +2,27 @@ const Comment = require('../models/comment'); // Adjust the path as necessary
 
 // Post a new comment
 exports.postComment = async (req, res) => {
-    const { recipeId, userId, content } = req.body; // Extract comment text from "content" field
+    // Extracting recipeId from the URL path parameters
+    const { recipeId } = req.params;
+    // Assuming the userId is available through some form of authentication middleware
+    const userId = req.user.userId;
+    // Extracting the content of the comment from the request body
+    const { content } = req.body;
+
     try {
-        const newComment = await Comment.create({ recipeId, userId, commentText: content }); // Pass content as commentText
+        // Passing the extracted content as commentText to the Comment model's create method
+        const newComment = await Comment.create({
+            recipeId,
+            userId,
+            commentText: content  // Ensure this matches the column name in your table
+        });
         res.status(201).json({ message: 'Comment posted successfully', comment: newComment });
     } catch (error) {
-        res.status(500).json({ message: 'Error posting comment', error: error.message });
+        console.error("Error posting comment:", error);
+        res.status(500).json({ message: 'Error posting comment', error: error.toString() });
     }
 };
+
 
 
 // Update an existing comment

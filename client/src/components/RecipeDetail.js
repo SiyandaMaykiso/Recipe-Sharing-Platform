@@ -21,13 +21,12 @@ const RecipeDetail = () => {
             throw new Error('Failed to fetch comments');
           }
           const commentsData = await commentsResponse.json();
-          console.log("Fetched Comments Data:", commentsData); // Log to inspect the structure
           setComments(commentsData); // Assume commentsData is an array
         } catch (error) {
           console.error("Error fetching comments:", error);
           setComments([]); // Ensure comments is reset to an empty array on error
         }
-      };
+    };
 
     fetchRecipeDetails();
     fetchComments();
