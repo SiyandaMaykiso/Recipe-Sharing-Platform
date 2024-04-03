@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const RecipeDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // Initialize navigate function
   const [recipe, setRecipe] = useState({});
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(0); // Initialize rating as 0
   const [error, setError] = useState('');
+
 
   useEffect(() => {
     async function fetchData() {
@@ -93,6 +95,8 @@ const RecipeDetail = () => {
 
   return (
     <div>
+        {/* Button to navigate back to the Dashboard */}
+      <button onClick={() => navigate('/dashboard')} style={{ marginBottom: '20px' }}>Back to Dashboard</button>
       <h2>{recipe.title}</h2>
       <p>{recipe.description}</p>
       {/* Display more recipe details here */}

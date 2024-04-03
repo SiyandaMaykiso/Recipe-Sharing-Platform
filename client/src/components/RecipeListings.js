@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
+  const navigate = useNavigate(); // Initialize navigate function
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -29,6 +30,8 @@ const RecipeListings = () => {
   return (
     <div className="recipe-listings">
       <h1>Recipes</h1>
+      {/* Add a button to navigate back to the Dashboard */}
+      <button onClick={() => navigate('/dashboard')} style={{ marginBottom: '20px' }}>Back to Dashboard</button>
       <div className="recipes-grid">
         {recipes.map((recipe) => (
           <div key={recipe.id || recipe.recipe_id} className="recipe-card"> {/* Adjust key to match your data */}
