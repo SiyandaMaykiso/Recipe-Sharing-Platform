@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
@@ -12,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(localStorage.getItem('token') || '');
 
   useEffect(() => {
-    // Sync authToken and currentUser with localStorage
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(currentUser));
   }, [authToken, currentUser]);
@@ -26,15 +24,14 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to log in');
       }
-
+  
       const data = await response.json();
       setCurrentUser(data.user); // Update state with the user's information
-      setAuthToken(data.token); // Update state with the authentication token
-      // Also directly update localStorage to ensure it's immediately available
+      setAuthToken(data.token); // **This line uses setAuthToken**
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
     } catch (error) {
@@ -44,11 +41,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear user info from state and local storage
-    setCurrentUser(null);
-    setAuthToken('');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // Logout implementation...
   };
 
   const getAuthHeader = () => {
@@ -56,11 +49,37 @@ export const AuthProvider = ({ children }) => {
     return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
   };
 
+  const updateProfile = async (formData) => {
+    try {
+      const response = await fetch('http://localhost:3000/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          // Note: Do not set 'Content-Type' here. Let the browser set it for FormData
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      const updatedUser = await response.json();
+      setCurrentUser(updatedUser); // Update the currentUser state with the updated data
+      localStorage.setItem('user', JSON.stringify(updatedUser)); // Also update local storage
+    } catch (error) {
+      console.error("Failed to update profile:", error.message);
+      throw error; // Let the calling code handle the error
+    }
+  };
+
   const value = {
     currentUser,
     login,
     logout,
     getAuthHeader,
+    updateProfile, // Make the updateProfile method available to components
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

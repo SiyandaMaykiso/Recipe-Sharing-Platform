@@ -8,11 +8,20 @@ body, h1, h2, h3, p, form, input, button {
 /* Sets a font and some basic background colors */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #FFF3E4; /* Soft peach background */
+  background-color: #FFF3E4; ; /* Soft peach background */
   color: #5A4A42; /* Dark brown text for soft contrast */
   line-height: 1.6;
   padding: 20px;
 }
+
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Adjust height as needed */
+}
+
 
 .container {
   max-width: 1100px;
@@ -306,4 +315,3 @@ body {
   display: block; /* Makes it take the full width, ensuring it starts on a new line */
   margin-top: 20px; /* Adds space above it */
 }
-

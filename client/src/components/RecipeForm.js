@@ -29,18 +29,23 @@ const RecipeForm = ({ initialValues, onSubmit }) => {
   };
 
   return (
-    <div className="recipe-form-container">
+    <div className="recipe-form-container container">
+      <h2 className="form-header">Add New Recipe</h2>
       <Formik
         initialValues={initialValues}
-        onSubmit={handleSubmit} // Use custom handleSubmit
+        onSubmit={handleSubmit}
       >
         {({ values, isSubmitting }) => (
-          <Form>
-            <label htmlFor="title">Title</label>
-            <Field id="title" name="title" placeholder="Chocolate Cake" />
+          <Form className="form">
+            <div className="form-control">
+              <label htmlFor="title">Title</label>
+              <Field id="title" name="title" placeholder="Chocolate Cake" className="input"/>
+            </div>
 
-            <label htmlFor="description">Description</label>
-            <Field id="description" name="description" as="textarea" placeholder="Delicious chocolate cake..." />
+            <div className="form-control">
+              <label htmlFor="description">Description</label>
+              <Field id="description" name="description" as="textarea" placeholder="Delicious chocolate cake..." className="textarea"/>
+            </div>
 
             <FieldArray name="ingredients">
               {({ insert, remove, push }) => (
@@ -48,22 +53,21 @@ const RecipeForm = ({ initialValues, onSubmit }) => {
                   <h4>Ingredients</h4>
                   {values.ingredients.length > 0 &&
                     values.ingredients.map((ingredient, index) => (
-                      <div key={index} className="ingredient-field">
+                      <div key={index} className="ingredient-field form-control">
                         <Field name={`ingredients.${index}.name`} placeholder="Ingredient" className="ingredient-input" />
                         <Field name={`ingredients.${index}.quantity`} placeholder="Quantity" className="ingredient-input" />
                         <div className="ingredient-actions">
-                          <button type="button" onClick={() => remove(index)}>- Remove</button>
-                          <button type="button" onClick={() => push({ name: '', quantity: '' })}>+ Add More</button>
+                          <button type="button" className="btn" onClick={() => remove(index)}>- Remove</button>
+                          <button type="button" className="btn" onClick={() => push({ name: '', quantity: '' })}>+ Add More</button>
                         </div>
                       </div>
                     ))}
-                  <button type="button" onClick={() => push({ name: '', quantity: '' })}>+ Add Ingredient</button>
+                  <button type="button" className="btn" onClick={() => push({ name: '', quantity: '' })}>+ Add Ingredient</button>
                 </div>
               )}
             </FieldArray>
 
-            {/* File input for image upload */}
-            <div>
+            <div className="form-control">
               <label htmlFor="recipeImage">Recipe Image:</label>
               <input
                 id="recipeImage"
@@ -71,12 +75,13 @@ const RecipeForm = ({ initialValues, onSubmit }) => {
                 type="file"
                 accept="image/png, image/jpeg"
                 onChange={handleFileChange}
+                className="input-file"
               />
             </div>
 
-            {submissionError && <div style={{ color: 'red', marginTop: '10px' }}>{submissionError}</div>}
-            <button type="submit" disabled={isSubmitting}>Submit</button>
-            <Link to="/dashboard" className="button-link">Back to Dashboard</Link>
+            {submissionError && <div className="error-message">{submissionError}</div>}
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Submit</button>
+            <Link to="/dashboard" className="btn btn-secondary">Back to Dashboard</Link>
           </Form>
         )}
       </Formik>

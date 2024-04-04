@@ -82,21 +82,17 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Update user profile
-// Update user profile
+// Update user profile to include profile picture handling
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.userId;
+    const userId = req.user.userId; // Get userId from the authenticated user
     const { username, email } = req.body;
+    const profileImagePath = req.file ? req.file.path : null; // Access the uploaded file path
 
     try {
-        // Ensure we don't attempt to update fields to null if they're not provided
         let updateFields = {};
-        if (username !== undefined) {
-            updateFields.username = username;
-        }
-        if (email !== undefined) {
-            updateFields.email = email;
-        }
+        if (username) updateFields.username = username;
+        if (email) updateFields.email = email;
+        if (profileImagePath) updateFields.profileImagePath = profileImagePath; // Add profile image path to update fields if file is uploaded
 
         const updatedUser = await User.update(userId, updateFields);
 
@@ -104,10 +100,10 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Exclude sensitive information like password from the response
-        const { password, ...userInfoWithoutPassword } = updatedUser;
+        // Optionally, return the updated user information, excluding sensitive data
+        const { password, ...updatedUserInfo } = updatedUser;
         
-        res.json({ message: 'Profile updated successfully', user: userInfoWithoutPassword });
+        res.json({ message: 'Profile updated successfully', user: updatedUserInfo });
     } catch (error) {
         res.status(500).json({ message: 'Error updating profile', error: error.message });
     }

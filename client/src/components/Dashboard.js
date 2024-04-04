@@ -5,8 +5,8 @@ const Dashboard = () => {
   const [recipes, setRecipes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({ id: null, title: '', description: '' });
-  const [fetchId, setFetchId] = useState(''); // State for input of ID to fetch
-  const [fetchedRecipe, setFetchedRecipe] = useState(null); // State to store the fetched recipe
+  const [fetchId, setFetchId] = useState('');
+  const [fetchedRecipe, setFetchedRecipe] = useState(null);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -19,7 +19,6 @@ const Dashboard = () => {
         console.error("Error fetching recipes:", error);
       }
     };
-
     fetchRecipes();
   }, []);
 
@@ -75,40 +74,47 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <h1>Recipes</h1>
-      <Link to="/add-recipe" className="add-recipe-button">Add New Recipe</Link>
-      <Link to="/recipes" className="view-recipes-button">View Recipes</Link>
+      <h1 className="main-header">Recipes Dashboard</h1>
+      <div className="nav-links">
+        <Link to="/add-recipe" className="btn btn-primary">Add New Recipe</Link>
+        <Link to="/recipes" className="btn btn-secondary">View Recipes</Link>
+        <Link to="/user" className="btn">View Profile</Link> {/* Styling for navigation to UserProfile */}
+      </div>
+
       {isEditing ? (
-        <div>
-          <input type="text" name="title" value={editFormData.title} onChange={handleEditFormChange} />
-          <input type="text" name="description" value={editFormData.description} onChange={handleEditFormChange} />
-          <button onClick={saveEdit}>Save</button>
-        </div>
+        <form className="form-control">
+          <input type="text" name="title" value={editFormData.title} onChange={handleEditFormChange} className="ingredient-input" />
+          <input type="text" name="description" value={editFormData.description} onChange={handleEditFormChange} className="ingredient-input" />
+          <button className="btn" onClick={saveEdit}>Save</button>
+        </form>
       ) : (
         <>
-          <div>
+          <div className="form-control">
             <input
               type="text"
               value={fetchId}
               onChange={(e) => setFetchId(e.target.value)}
               placeholder="Enter Recipe ID"
+              className="ingredient-input"
             />
-            <button onClick={fetchRecipeById}>Fetch Recipe</button>
+            <button className="btn" onClick={fetchRecipeById}>Fetch Recipe</button>
           </div>
           {fetchedRecipe && (
-            <div>
+            <div className="card">
               <h2>Recipe Details</h2>
-              <p>Title: {fetchedRecipe.title}</p>
-              <p>Description: {fetchedRecipe.description}</p>
-              {/* Display more details of the fetched recipe */}
+              <p><strong>Title:</strong> {fetchedRecipe.title}</p>
+              <p><strong>Description:</strong> {fetchedRecipe.description}</p>
+              {/* Consider adding more details */}
             </div>
           )}
-          <ul>
+          <ul className="recipe-list">
             {recipes.map((recipe) => (
-              <li key={recipe.id}>
-                {recipe.title}
-                <button onClick={() => startEdit(recipe)}>Edit</button>
-                <button onClick={() => deleteRecipe(recipe.id)}>Delete</button>
+              <li key={recipe.id} className="recipe-item">
+                <span className="recipe-title">{recipe.title}</span>
+                <div className="recipe-actions">
+                  <button className="btn" onClick={() => startEdit(recipe)}>Edit</button>
+                  <button className="btn" onClick={() => deleteRecipe(recipe.id)}>Delete</button>
+                </div>
               </li>
             ))}
           </ul>

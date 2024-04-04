@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useParams, useNavigate } from 'react-router-dom'; // Now without Link
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -9,7 +9,6 @@ const RecipeDetail = () => {
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(0); // Initialize rating as 0
   const [error, setError] = useState('');
-
 
   useEffect(() => {
     async function fetchData() {
@@ -93,35 +92,40 @@ const RecipeDetail = () => {
 
   if (error) return <div>Error: {error}</div>;
 
-  return (
-    <div>
-        {/* Button to navigate back to the Dashboard */}
-      <button onClick={() => navigate('/dashboard')} style={{ marginBottom: '20px' }}>Back to Dashboard</button>
-      <h2>{recipe.title}</h2>
-      <p>{recipe.description}</p>
-      {/* Display more recipe details here */}
+   // Add 'container' class to align with global styling and improve layout consistency
+   return (
+    <div className="container recipe-detail-container">
+      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary" style={{ marginBottom: '20px' }}>Back to Dashboard</button>
+      <div className="recipe-header">
+        <h2>{recipe.title}</h2>
+        <p>{recipe.description}</p>
+        {/* Consider adding more recipe details here with appropriate styling */}
+      </div>
 
-      <h3>Comments</h3>
-      {comments.map((comment, index) => (
-        <div key={index}>
-          <p>{comment.content}</p>
-        </div>
-      ))}
+      <div className="comments-section">
+        <h3>Comments</h3>
+        {comments.map((comment, index) => (
+          <div key={index} className="comment">
+            <p>{comment.content}</p>
+          </div>
+        ))}
+      </div>
 
-      <form onSubmit={handleCommentSubmit}>
+      <form onSubmit={handleCommentSubmit} className="comment-form">
         <textarea
+          className="textarea"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Leave a comment"
         />
-        <button type="submit">Post Comment</button>
+        <button type="submit" className="btn btn-primary">Post Comment</button>
       </form>
 
-      {/* Rating submission section */}
-      <div>
+      <div className="rating-section">
         <h3>Rate this recipe</h3>
-        <form onSubmit={handleRatingSubmit}>
+        <form onSubmit={handleRatingSubmit} className="rating-form">
           <input
+            className="input"
             type="number"
             min="1"
             max="5"
@@ -129,9 +133,12 @@ const RecipeDetail = () => {
             onChange={(e) => setNewRating(e.target.value)}
             placeholder="Rate 1-5"
           />
-          <button type="submit">Submit Rating</button>
+          <button type="submit" className="btn btn-primary">Submit Rating</button>
         </form>
       </div>
+      
+      {/* Display error messages in a styled div */}
+      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };
