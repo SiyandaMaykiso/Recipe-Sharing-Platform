@@ -1,22 +1,18 @@
-// src/components/Registration.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection after successful registration
+import { useNavigate } from 'react-router-dom';
 
 function Registration() {
-  // State to store the form fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // Optionally, state to store any registration error messages
   const [registrationError, setRegistrationError] = useState('');
 
-  const navigate = useNavigate(); // Initialize navigate function for redirection
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the form from causing a page reload
+    e.preventDefault();
 
     try {
-      // Make sure this URL matches your backend endpoint for registration
       const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
         headers: {
@@ -26,17 +22,26 @@ function Registration() {
       });
 
       if (!response.ok) {
-        // If registration is not successful, throw an error with the response's status text or a custom message
         throw new Error(response.statusText || 'Registration failed');
       }
 
       const data = await response.json();
       console.log('Registration successful:', data);
-      // Redirect to login page or home page after successful registration
-      navigate('/login'); // Adjust as needed based on your application's routes
+
+      // Save user details and token if backend response includes these
+      if (data.user && data.token) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        // Specifically save the user_id for later use
+        localStorage.setItem('user_id', data.user.user_id);
+      } else {
+        console.error('User details or token not provided in registration response');
+      }
+
+      navigate('/login');
     } catch (error) {
       console.error('Registration error:', error);
-      setRegistrationError('Failed to register. Please try again.'); // Update the UI to show an error message
+      setRegistrationError('Failed to register. Please try again.');
     }
   };
 
@@ -44,35 +49,18 @@ function Registration() {
     <div>
       <h2>Registration Form</h2>
       <form onSubmit={handleSubmit}>
+        {/* Form fields */}
         <div>
           <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <input type="text" id="name" required value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div>
           <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <input type="email" id="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div>
           <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <input type="password" id="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         <button type="submit">Register</button>
         {registrationError && <div style={{ color: 'red' }}>{registrationError}</div>}

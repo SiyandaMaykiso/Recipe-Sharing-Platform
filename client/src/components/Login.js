@@ -24,18 +24,22 @@ function Login() {
       }
   
       const data = await response.json();
-      localStorage.setItem('token', data.token); // Use 'token' as the key for consistency
+      localStorage.setItem('token', data.token); // Save the token
+      localStorage.setItem('user', JSON.stringify(data.user)); // Save user data
   
-      // Optionally: Save user details in local storage if the backend also returns user data
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Check if data.user actually contains user_id and save it
+      if (data.user && data.user.user_id) {
+        localStorage.setItem('user_id', data.user.user_id);
+      } else {
+        console.error('User ID not found in login response');
+      }
   
-      navigate('/dashboard');
+      navigate('/dashboard'); // Navigate to dashboard after successful login
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('Failed to login. Please check your credentials.');
     }
   };
-  
 
   return (
     <div>

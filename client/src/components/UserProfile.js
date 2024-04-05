@@ -75,7 +75,7 @@ const UserProfile = () => {
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-control">
           <label>New Email:</label>
-          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} />
+          <input type="email"value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} />
         </div>
         <div className="form-control">
           <label>Profile Image:</label>

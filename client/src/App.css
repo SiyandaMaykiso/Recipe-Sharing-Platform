@@ -127,7 +127,7 @@ body {
 
 /* Adjusting input and textarea width */
 .form-control input, .form-control textarea {
-  width: 100%;
+  width: 110%;
 }
 
 /* Link styling adjustments */
@@ -161,7 +161,7 @@ body {
 .recipe-title {
   margin-bottom: 10px;
   font-size: 20px;
-  color: #E95536; /* Use primary color for titles */
+  color: #5A4A42; /* Use primary color for titles */
 }
 
 .recipe-listings .recipes-grid {
