@@ -1,31 +1,29 @@
 const Recipe = require('../models/recipe'); // Adjust the path as necessary
 
-// Create a new recipe
 exports.create = async (req, res) => {
-    console.log("Request body:", req.body);
-    const { user_id, title, description, creationDate } = req.body;
-    // Extract the file information (if uploaded)
-    console.log("Received user_id:", user_id);
-    const imagePath = req.file ? req.file.path : null;
-
-    // Validate required fields
-    if (!user_id || !title || !description) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
-
     try {
-        // Include imagePath in the data to be saved
-        const newRecipe = await Recipe.create({
-            user_id, // Use the correct field name as expected by your database
+        // Extracting fields from req.body
+        const { title, description } = req.body;
+        let { ingredients } = req.body;
+        const user_id = parseInt(req.body.user_id); // Ensure user_id is an integer
+        const imagePath = req.file ? req.file.path : ''; // Handling file upload path
+
+        // Parse ingredients if it's a string (due to JSON.stringify on the client-side)
+        if (typeof ingredients === 'string') {
+            ingredients = JSON.parse(ingredients);
+        }
+
+        const recipe = await Recipe.create({
+            userId: user_id, // Ensure this matches the model's expected parameter name
             title,
             description,
-            creationDate,
             imagePath
-        });
-        res.status(201).json({ message: 'Recipe created successfully', recipe: newRecipe });
+          });
+          
+        return res.status(201).json({ message: 'Recipe created successfully', recipe });
     } catch (error) {
-        console.error('Error creating recipe:', error.stack); // Enhanced error logging
-        res.status(500).json({ message: 'Error creating recipe', error: error.message });
+        console.error('Error creating recipe:', error);
+        return res.status(500).json({ message: 'Error creating recipe', error: error.toString() });
     }
 };
 

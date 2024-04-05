@@ -11,35 +11,33 @@ function Login() {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
   
-      if (!response.ok) {
-        throw new Error(response.statusText || 'Login failed');
-      }
+        if (!response.ok) {
+            throw new Error(response.statusText || 'Login failed');
+        }
   
-      const data = await response.json();
-      localStorage.setItem('token', data.token); // Save the token
-      localStorage.setItem('user', JSON.stringify(data.user)); // Save user data
+        const data = await response.json();
   
-      // Check if data.user actually contains user_id and save it
-      if (data.user && data.user.user_id) {
-        localStorage.setItem('user_id', data.user.user_id);
-      } else {
-        console.error('User ID not found in login response');
-      }
-  
-      navigate('/dashboard'); // Navigate to dashboard after successful login
+        // Assuming the response includes a user object with a user_id and a token
+        if (data.token && data.user && data.user.user_id) {
+            // Store the user object including both user_id and token in localStorage
+            localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));
+            navigate('/dashboard'); // Navigate to dashboard after successful login
+        } else {
+            throw new Error('Login response missing user ID or token');
+        }
     } catch (error) {
-      console.error('Login error:', error);
-      setLoginError('Failed to login. Please check your credentials.');
+        console.error('Login error:', error);
+        setLoginError('Failed to login. Please check your credentials.');
     }
-  };
+};
 
   return (
     <div>

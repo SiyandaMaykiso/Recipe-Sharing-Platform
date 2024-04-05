@@ -3,60 +3,64 @@ import { Formik, Form, Field, FieldArray } from 'formik';
 import { Link } from 'react-router-dom';
 
 const RecipeForm = ({ initialValues }) => {
-    const [submissionError, setSubmissionError] = useState('');
-    const [selectedFile, setSelectedFile] = useState(null);
+  const [submissionError, setSubmissionError] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
-    };
-
-    const handleSubmit = async (values, { setSubmitting }) => {
-        const formData = new FormData();
-        Object.keys(values).forEach(key => {
-            if (key === 'ingredients') {
-                formData.append(key, JSON.stringify(values[key]));
-            } else {
-                formData.append(key, values[key]);
-            }
-        });
-
-        if (selectedFile) {
-          formData.append('recipeImage', selectedFile);
-      }
-
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user ? user.user_id : null;
-
-      if (!userId) {
-          console.error('User ID not found in localStorage');
-          setSubmissionError('User ID not found. Please log in again.');
-          setSubmitting(false);
-          return;
-      }
-
-        formData.append('user_id', userId);
-
-        try {
-            const response = await fetch('http://localhost:3000/recipes', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-
-          const result = await response.json();
-          console.log("Success:", result);
-          setSubmissionError('');
-      } catch (error) {
-          console.error('Submission error:', error);
-          setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
-      } finally {
-          setSubmitting(false);
-      }
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
   };
- 
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const formData = new FormData();
+    Object.keys(values).forEach(key => {
+      if (key === 'ingredients') {
+        formData.append(key, JSON.stringify(values[key])); // Handle array of ingredients
+      } else {
+        formData.append(key, values[key]);
+      }
+    });
+
+    if (selectedFile) {
+      formData.append('recipeImage', selectedFile);
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user ? user.user_id : null;
+    const token = user ? user.token : null;
+
+    if (!userId || !token) {
+      console.error('User ID or token not found in localStorage');
+      setSubmissionError('Authentication required. Please log in again.');
+      setSubmitting(false);
+      return;
+    }
+
+    formData.append('user_id', userId);
+
+    try {
+      const response = await fetch('http://localhost:3000/recipes', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log("Success:", result);
+      setSubmissionError('');
+    } catch (error) {
+      console.error('Submission error:', error);
+      setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
 
   return (
     <div className="recipe-form-container container">
