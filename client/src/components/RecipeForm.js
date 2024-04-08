@@ -22,54 +22,66 @@ const RecipeForm = ({ initialValues }) => {
     };
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-      console.log('Submitting Ingredients:', values.ingredients);
-      const formData = new FormData();
-      formData.append('title', values.title);
-      formData.append('description', values.description);
-      formData.append('ingredients', values.ingredients);
-      formData.append('instructions', values.instructions);
+        console.log('Submitting Ingredients:', values.ingredients);
+        const formData = new FormData();
+        formData.append('title', values.title);
+        formData.append('description', values.description);
+        formData.append('ingredients', values.ingredients);
+        formData.append('instructions', values.instructions);
 
-      if (selectedFile) {
-          formData.append('recipeImage', selectedFile);
-      }
+        if (selectedFile) {
+            formData.append('recipeImage', selectedFile);
+        }
 
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user ? user.user_id : null;
-      const token = user ? user.token : null;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user ? user.user_id : null;
+        const token = user ? user.token : null;
 
-      if (!userId || !token) {
-          console.error('User ID or token not found in localStorage');
-          setSubmissionError('Authentication required. Please log in again.');
-          setSubmitting(false);
-          return;
-      }
+        if (!userId || !token) {
+            console.error('User ID or token not found in localStorage');
+            setSubmissionError('Authentication required. Please log in again.');
+            setSubmitting(false);
+            return;
+        }
 
-      formData.append('user_id', userId);
+        formData.append('user_id', userId);
 
-      try {
-          const response = await fetch('http://localhost:3000/recipes', {
-              method: 'POST',
-              body: formData,
-              headers: {
-                  'Authorization': `Bearer ${token}`,
-              },
-          });
+        try {
+            const response = await fetch('http://localhost:3000/recipes', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
 
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-          const result = await response.json();
-          console.log("Success:", result);
-          setSuccessMessage('Recipe successfully uploaded!');
-          resetForm({ values: '' }); // Reset the form with empty values
-      } catch (error) {
-          console.error('Submission error:', error);
-          setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
-      } finally {
-          setSubmitting(false);
-      }
+            const result = await response.json();
+            console.log("Success:", result);
+            setSuccessMessage('Recipe successfully uploaded!');
+            resetForm({ values: '' }); // Reset the form with empty values
+        } catch (error) {
+            console.error('Submission error:', error);
+            setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleAutoExpand = (event) => {
+      // Reset height and width to auto
+      event.target.style.height = 'auto';
+      event.target.style.width = 'auto';
+
+      // Set height to the scroll height of the content
+      event.target.style.height = `${event.target.scrollHeight}px`;
+      // Set width to the scroll width of the content
+      event.target.style.width = `${event.target.scrollWidth}px`;
   };
+
 
     return (
         <div className="recipe-form-container container">
@@ -88,11 +100,11 @@ const RecipeForm = ({ initialValues }) => {
                         </div>
                         <div className="form-control">
                             <label htmlFor="ingredients">Ingredients</label>
-                            <Field id="ingredients" name="ingredients" as="textarea" placeholder="List all ingredients" />
+                            <Field id="ingredients" name="ingredients" as="textarea" placeholder="List all ingredients" onInput={handleAutoExpand} />
                         </div>
                         <div className="form-control">
                             <label htmlFor="instructions">Instructions</label>
-                            <Field id="instructions" name="instructions" as="textarea" placeholder="Cooking instructions" />
+                            <Field id="instructions" name="instructions" as="textarea" placeholder="Cooking instructions" onInput={handleAutoExpand} />
                         </div>
                         <div className="form-control">
                             <label htmlFor="recipeImage">Recipe Image</label>
