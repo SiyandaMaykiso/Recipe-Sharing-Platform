@@ -2,24 +2,20 @@ const Recipe = require('../models/recipe'); // Adjust the path as necessary
 
 exports.create = async (req, res) => {
     try {
-        // Extracting fields from req.body
-        const { title, description } = req.body;
-        let { ingredients } = req.body;
-        const user_id = parseInt(req.body.user_id); // Ensure user_id is an integer
-        const imagePath = req.file ? req.file.path : ''; // Handling file upload path
+        const { title, description, ingredients, instructions } = req.body;
+        const user_id = parseInt(req.body.user_id);
+        const imagePath = req.file ? req.file.path : '';
 
-        // Parse ingredients if it's a string (due to JSON.stringify on the client-side)
-        if (typeof ingredients === 'string') {
-            ingredients = JSON.parse(ingredients);
-        }
-
+        // No need to parse ingredients and instructions since they are strings
         const recipe = await Recipe.create({
-            userId: user_id, // Ensure this matches the model's expected parameter name
+            userId: user_id,
             title,
             description,
-            imagePath
-          });
-          
+            ingredients, // Directly passed as strings
+            instructions, // Directly passed as strings
+            imagePath,
+        });
+
         return res.status(201).json({ message: 'Recipe created successfully', recipe });
     } catch (error) {
         console.error('Error creating recipe:', error);
@@ -33,7 +29,7 @@ exports.listAll = async (req, res) => {
         const recipes = await Recipe.findAll();
         res.status(200).json(recipes);
     } catch (error) {
-        console.error('Error retrieving recipes:', error.stack); // Enhanced error logging
+        console.error('Error retrieving recipes:', error);
         res.status(500).json({ message: 'Error retrieving recipes', error: error.message });
     }
 };
