@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path'); // Make sure to require 'path'
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
@@ -18,6 +19,9 @@ const app = express();
 // Middleware
 app.use(cors()); // Enables CORS for all requests. Customize as needed.
 app.use(express.json()); // Parses incoming requests with JSON payloads
+
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Use routes
 app.use(userRoutes);

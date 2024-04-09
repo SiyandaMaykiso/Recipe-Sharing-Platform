@@ -24,7 +24,7 @@ const UserProfile = () => {
     setError('');
     try {
       await logout();
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error('Logout failed', error);
       setError('Logout failed. Please try again.');

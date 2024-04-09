@@ -320,3 +320,7 @@ body {
 .resizable-textarea {
   resize: vertical; /* Allow vertical resizing */
 }
+
+.resizable-textarea {
+  resize: horizontal; /* Allow horizantle resizing */
+}

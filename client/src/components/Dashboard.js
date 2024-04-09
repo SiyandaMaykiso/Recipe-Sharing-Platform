@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 const Dashboard = () => {
     const [recipes, setRecipes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
-    // Correct the initial state to include recipe_id instead of id
     const [editFormData, setEditFormData] = useState({
         recipe_id: null,
         title: '',
@@ -15,7 +14,6 @@ const Dashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
-    // Fetch recipes on mount
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem('user'));
         const token = user ? user.token : null;
@@ -26,7 +24,6 @@ const Dashboard = () => {
         }
     }, [navigate]);
 
-    // Fetch recipes from the API
     const fetchRecipes = async (token) => {
         try {
             const response = await fetch('http://localhost:3000/recipes', {
@@ -43,12 +40,10 @@ const Dashboard = () => {
         }
     };
 
-    // Initialize editing state
     const startEdit = (recipe) => {
-        console.log('Starting edit for:', recipe);
         setIsEditing(true);
         setEditFormData({
-            recipe_id: recipe.recipe_id, // Ensure we're using recipe_id from the recipe object
+            recipe_id: recipe.recipe_id,
             title: recipe.title,
             description: recipe.description,
             ingredients: recipe.ingredients || '',
@@ -56,16 +51,13 @@ const Dashboard = () => {
         });
     };
 
-    // Handle form field changes
     const handleEditFormChange = (event) => {
         const { name, value } = event.target;
         setEditFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Save edits to the API
     const saveEdit = async () => {
         const { recipe_id, title, description, ingredients, instructions } = editFormData;
-        console.log(`Attempting to update recipe with ID: ${recipe_id}`); // Added log to check ID
         const user = JSON.parse(localStorage.getItem('user'));
         const token = user ? user.token : null;
 
@@ -80,7 +72,7 @@ const Dashboard = () => {
             });
 
             if (!response.ok) throw new Error('Failed to update the recipe');
-            fetchRecipes(token); // Refresh the recipes list
+            fetchRecipes(token); // Refresh the recipes list to reflect the update
             setIsEditing(false);
             setSuccessMessage('Recipe updated successfully!');
             setTimeout(() => setSuccessMessage(''), 3000);
@@ -91,7 +83,6 @@ const Dashboard = () => {
         }
     };
 
-    // Delete a recipe
     const deleteRecipe = async (recipeId) => {
         const token = localStorage.getItem('token');
         try {
@@ -102,7 +93,7 @@ const Dashboard = () => {
                 },
             });
             if (!response.ok) throw new Error('Failed to delete the recipe');
-            fetchRecipes(token); // Refresh the recipes list
+            fetchRecipes(token); // Refresh the recipes list to reflect the deletion
         } catch (error) {
             console.error("Error deleting recipe:", error);
         }
@@ -118,55 +109,63 @@ const Dashboard = () => {
                 <Link to="/user" className="btn">View Profile</Link>
             </div>
             {isEditing && (
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <div>
+                <form onSubmit={(e) => e.preventDefault()} className="form-container">
+                    <div className="form-control">
                         <label>Title</label>
                         <input
                             type="text"
                             name="title"
                             value={editFormData.title}
                             onChange={handleEditFormChange}
+                            className="ingredient-input"
                         />
                     </div>
-                    <div>
+                    <div className="form-control">
                         <label>Description</label>
                         <textarea
                             name="description"
                             value={editFormData.description}
                             onChange={handleEditFormChange}
+                            className="ingredient-input"
+                            style={{ overflow: 'hidden' }}
+                            onInput={(e) => {
+                                e.target.style.height = 'inherit';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                            }}
                         />
                     </div>
-                    <div>
+                    <div className="form-control">
                         <label>Ingredients</label>
                         <textarea
                             name="ingredients"
                             value={editFormData.ingredients}
                             onChange={handleEditFormChange}
+                            className="ingredient-input"
                         />
                     </div>
-                    <div>
+                    <div className="form-control">
                         <label>Instructions</label>
                         <textarea
                             name="instructions"
                             value={editFormData.instructions}
                             onChange={handleEditFormChange}
+                            className="ingredient-input"
                         />
                     </div>
-                    <button type="button" onClick={saveEdit}>Save</button>
+                    <button type="button" onClick={saveEdit} className="btn">Save</button>
                 </form>
             )}
-       <ul className="recipe-list">
-       {recipes.map((recipe) => (
-    <li key={recipe.id} className="recipe-item">
-        <span className="recipe-title">{recipe.title}</span>
-        <div className="recipe-actions">
-        <button className="btn" onClick={() => startEdit(recipe)}>Edit</button>
-            <button className="btn" onClick={() => deleteRecipe(recipe.id)}>Delete</button>
-        </div>
-    </li>
-))}
-</ul>
-
+            <ul className="recipe-list">
+                {recipes.map((recipe) => (
+                    <li key={recipe.recipe_id} className="recipe-item">
+                        <span className="recipe-title">{recipe.title}</span>
+                        <div className="recipe-actions">
+                            <button className="btn" onClick={() => startEdit(recipe)}>Edit</button>
+                            <button className="btn" onClick={() => deleteRecipe(recipe.recipe_id)}>Delete</button>
+                        </div>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
