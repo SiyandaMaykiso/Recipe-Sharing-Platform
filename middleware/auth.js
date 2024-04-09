@@ -8,11 +8,14 @@ const authenticate = (req, res, next) => {
         return res.status(401).json({ message: "Authentication token is required" });
     }
 
+    console.log("Extracted Token:", token);
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Add the decoded user to the request object
-        next(); // Proceed to the next middleware or route handler
+        console.log("Decoded Token:", decoded);
+        req.user = decoded;
+        next();
     } catch (error) {
+        console.log("Token Verification Error:", error.message);
         return res.status(403).json({ message: "Invalid or expired token" });
     }
 };

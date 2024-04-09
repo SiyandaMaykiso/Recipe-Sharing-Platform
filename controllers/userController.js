@@ -2,6 +2,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user'); // Adjust the path as necessary
 
+const generateAccessToken = (userId, email) => {
+    return jwt.sign(
+        { userId, email },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+    );
+};
+
 // User registration
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
@@ -116,5 +124,27 @@ exports.deleteAccount = async (req, res) => {
         res.status(204).send(); // No content to send back
     } catch (error) {
         res.status(500).json({ message: 'Error deleting account', error: error.message });
+    }
+};
+
+exports.refreshToken = async (req, res) => {
+    const refreshToken = req.body.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({ message: 'Refresh token is required' });
+    }
+
+    try {
+        // Verify the refresh token
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        // If refresh token is valid, generate a new access token
+        const accessToken = generateAccessToken(decoded.userId, decoded.email);
+
+        // Send the new access token to the client
+        res.json({ accessToken });
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        res.status(403).json({ message: 'Invalid or expired refresh token' });
     }
 };

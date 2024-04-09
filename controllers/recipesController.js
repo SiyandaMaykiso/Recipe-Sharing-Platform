@@ -52,26 +52,27 @@ exports.findById = async (req, res) => {
 
 // Update a recipe
 exports.update = async (req, res) => {
-    const { id } = req.params;
-    const { title, description } = req.body;
-    // Extract the file information (if uploaded)
+    const { id } = req.params; // Extracting the id from request parameters
+    console.log('Recipe ID:', id); // Add this line to log the recipe ID
+    const { title, description, ingredients, instructions } = req.body;
     const imagePath = req.file ? req.file.path : null;
 
     try {
-        // Pass imagePath only if a new file is uploaded
-        const updateData = imagePath ? { title, description, imagePath } : { title, description };
+        // Parse id to an integer
+        const recipeId = parseInt(id);
 
-        const updatedRecipe = await Recipe.update(id, updateData);
+        const updatedRecipe = await Recipe.update(recipeId, { title, description, ingredients, instructions, imagePath });
         if (updatedRecipe) {
             res.status(200).json({ message: 'Recipe updated successfully', recipe: updatedRecipe });
         } else {
             res.status(404).json({ message: 'Recipe not found' });
         }
     } catch (error) {
-        console.error('Error updating recipe:', error.stack); // Enhanced error logging
+        console.error('Error updating recipe:', error);
         res.status(500).json({ message: 'Error updating recipe', error: error.message });
     }
 };
+
 
 // Delete a recipe
 exports.delete = async (req, res) => {

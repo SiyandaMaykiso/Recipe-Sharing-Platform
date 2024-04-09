@@ -28,8 +28,8 @@ function Login() {
         // Assuming the response includes a user object with a user_id and a token
         if (data.token && data.user && data.user.user_id) {
             // Store the user object including both user_id and token in localStorage
-            localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));
-            navigate('/dashboard'); // Navigate to dashboard after successful login
+            localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));console.log('Login Token:', data.token); // Log the token to compare later
+navigate('/dashboard'); // Navigate to dashboard after successful login
         } else {
             throw new Error('Login response missing user ID or token');
         }
