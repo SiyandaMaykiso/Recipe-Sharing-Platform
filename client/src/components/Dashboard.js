@@ -51,9 +51,10 @@ const Dashboard = () => {
         });
     };
 
-    const handleEditFormChange = (event) => {
+      const handleEditFormChange = (event) => {
         const { name, value } = event.target;
         setEditFormData(prev => ({ ...prev, [name]: value }));
+        autoExpandTextArea(event.target);
     };
 
     const saveEdit = async () => {
@@ -97,6 +98,12 @@ const Dashboard = () => {
         } catch (error) {
             console.error("Error deleting recipe:", error);
         }
+    };
+
+       // Function to auto-expand text areas
+       const autoExpandTextArea = (element) => {
+        element.style.height = 'inherit';
+        element.style.height = `${element.scrollHeight}px`; // Adjust height based on scroll height
     };
 
     return (
@@ -144,12 +151,13 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="form-control">
-                        <label>Instructions</label>
+                    <label>Instructions</label>
                         <textarea
                             name="instructions"
                             value={editFormData.instructions}
                             onChange={handleEditFormChange}
                             className="ingredient-input"
+                            style={{ overflow: 'hidden', resize: 'none' }} // Prevent manual resizing
                         />
                     </div>
                     <button type="button" onClick={saveEdit} className="btn">Save</button>
