@@ -10,6 +10,7 @@ const Dashboard = () => {
         description: '',
         ingredients: '',
         instructions: '',
+        image: null, // Added for image handling
     });
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
@@ -51,38 +52,54 @@ const Dashboard = () => {
         });
     };
 
-      const handleEditFormChange = (event) => {
+    const handleEditFormChange = (event) => {
         const { name, value } = event.target;
-        setEditFormData(prev => ({ ...prev, [name]: value }));
+        if (name === "image") {
+            setEditFormData(prev => ({ ...prev, [name]: event.target.files[0] })); // Handle file selection
+        } else {
+            setEditFormData(prev => ({ ...prev, [name]: value }));
+        }
         autoExpandTextArea(event.target);
     };
 
-    const saveEdit = async () => {
-        const { recipe_id, title, description, ingredients, instructions } = editFormData;
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = user ? user.token : null;
-
-        try {
-            const response = await fetch(`http://localhost:3000/recipes/${recipe_id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ title, description, ingredients, instructions }),
-            });
-
-            if (!response.ok) throw new Error('Failed to update the recipe');
-            fetchRecipes(token); // Refresh the recipes list to reflect the update
-            setIsEditing(false);
-            setSuccessMessage('Recipe updated successfully!');
-            setTimeout(() => setSuccessMessage(''), 3000);
-        } catch (error) {
-            console.error("Error updating recipe:", error);
-            setSuccessMessage('Failed to update the recipe. Please try again.');
-            setTimeout(() => setSuccessMessage(''), 5000);
-        }
+    const autoExpandTextArea = (element) => {
+        element.style.height = 'inherit';
+        element.style.height = `${element.scrollHeight}px`;
     };
+
+const saveEdit = async () => {
+    const formData = new FormData();
+    formData.append('title', editFormData.title);
+    formData.append('description', editFormData.description);
+    formData.append('ingredients', editFormData.ingredients);
+    formData.append('instructions', editFormData.instructions);
+    if (editFormData.image) {
+        formData.append('image', editFormData.image);
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user ? user.token : null;
+
+    try {
+        const response = await fetch(`http://localhost:3000/recipes/${editFormData.recipe_id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData, // Sending as FormData to include image file
+        });
+
+        if (!response.ok) throw new Error('Failed to update the recipe');
+        fetchRecipes(token); // Refresh to show updated list
+        setIsEditing(false);
+        setSuccessMessage('Recipe updated successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+        console.error("Error updating recipe:", error);
+        setSuccessMessage('Failed to update the recipe. Please try again.');
+        setTimeout(() => setSuccessMessage(''), 5000);
+    }
+};
 
     const deleteRecipe = async (recipeId) => {
         const token = localStorage.getItem('token');
@@ -94,16 +111,10 @@ const Dashboard = () => {
                 },
             });
             if (!response.ok) throw new Error('Failed to delete the recipe');
-            fetchRecipes(token); // Refresh the recipes list to reflect the deletion
+            fetchRecipes(token); // Refresh to show updated list
         } catch (error) {
             console.error("Error deleting recipe:", error);
         }
-    };
-
-       // Function to auto-expand text areas
-       const autoExpandTextArea = (element) => {
-        element.style.height = 'inherit';
-        element.style.height = `${element.scrollHeight}px`; // Adjust height based on scroll height
     };
 
     return (
@@ -160,6 +171,15 @@ const Dashboard = () => {
                             style={{ overflow: 'hidden', resize: 'none' }} // Prevent manual resizing
                         />
                     </div>
+                    <div className="form-control">
+                        <label htmlFor="image">Recipe Image</label>
+                        <input
+                            type="file"
+                            name="image"
+                            onChange={handleEditFormChange} // Updated to handle file selection
+                        />
+                    </div>
+
                     <button type="button" onClick={saveEdit} className="btn">Save</button>
                 </form>
             )}
