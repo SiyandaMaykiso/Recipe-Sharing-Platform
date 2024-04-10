@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const recipesController = require('../controllers/recipesController'); // Adjust the path as necessary
-const { authenticate } = require('../middleware/auth'); // Assuming auth middleware is in a separate file
+const multer = require('multer'); // Import Multer
+const recipesController = require('../controllers/recipesController');
+const { authenticate } = require('../middleware/auth');
 const upload = require('../middleware/upload'); // Import your Multer configuration
 
 // Create a new recipe (Protected route)
@@ -17,7 +18,10 @@ router.get('/recipes/:id', recipesController.findById);
 
 // Update a recipe (Protected route)
 // Applying Multer middleware for image upload on recipe update
-router.put('/recipes/:id', authenticate, upload.single('recipeImage'), recipesController.update);
+router.put('/recipes/:id', authenticate, upload.single('recipeImage'), (req, res, next) => {
+    // No need to handle Multer errors here, as they are already handled by the middleware
+    next();
+}, recipesController.update);
 
 // Delete a recipe (Protected route)
 router.delete('/recipes/:id', authenticate, recipesController.delete);

@@ -52,16 +52,19 @@ exports.findById = async (req, res) => {
 
 // Update a recipe
 exports.update = async (req, res) => {
-    const { id } = req.params; // Extracting the id from request parameters
-    console.log('Recipe ID:', id); // Add this line to log the recipe ID
+    console.log("req.file:", req.file); // Log to see if the file is being received
+    const { id } = req.params;
     const { title, description, ingredients, instructions } = req.body;
-    const imagePath = req.file ? req.file.path : null;
+    let updateData = { title, description, ingredients, instructions };
+
+    if (req.file) {
+        const imagePath = req.file.path; // Only update imagePath if a new file is uploaded
+        updateData.imagePath = imagePath;
+    }
 
     try {
-        // Parse id to an integer
         const recipeId = parseInt(id);
-
-        const updatedRecipe = await Recipe.update(recipeId, { title, description, ingredients, instructions, imagePath });
+        const updatedRecipe = await Recipe.update(recipeId, updateData);
         if (updatedRecipe) {
             res.status(200).json({ message: 'Recipe updated successfully', recipe: updatedRecipe });
         } else {

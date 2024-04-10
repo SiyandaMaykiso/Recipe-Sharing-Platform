@@ -54,52 +54,73 @@ const Dashboard = () => {
 
     const handleEditFormChange = (event) => {
         const { name, value } = event.target;
-        if (name === "image") {
-            setEditFormData(prev => ({ ...prev, [name]: event.target.files[0] })); // Handle file selection
+        if (name === "recipeImage") {
+            // For file input, handle separately
+            handleImageChange(event); // This calls a separate function for handling image change
         } else {
+            // For all other inputs, including textareas for auto-expansion
             setEditFormData(prev => ({ ...prev, [name]: value }));
+            if(event.target.tagName.toLowerCase() === 'textarea') {
+                autoExpandTextArea(event.target);
+            }
         }
-        autoExpandTextArea(event.target);
     };
-
+    
+    const handleImageChange = (event) => {
+        // Directly updates the state with the file, assuming "image" is the correct field name
+        setEditFormData(prevFormData => ({
+            ...prevFormData,
+            image: event.target.files[0] // Gets the file from the input field
+        }));
+    };
+    
     const autoExpandTextArea = (element) => {
         element.style.height = 'inherit';
-        element.style.height = `${element.scrollHeight}px`;
+        element.style.height = `${element.scrollHeight}px`; // Adjusts height based on content
     };
 
-const saveEdit = async () => {
-    const formData = new FormData();
-    formData.append('title', editFormData.title);
-    formData.append('description', editFormData.description);
-    formData.append('ingredients', editFormData.ingredients);
-    formData.append('instructions', editFormData.instructions);
-    if (editFormData.image) {
-        formData.append('image', editFormData.image);
-    }
-
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user ? user.token : null;
-
-    try {
-        const response = await fetch(`http://localhost:3000/recipes/${editFormData.recipe_id}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData, // Sending as FormData to include image file
-        });
-
-        if (!response.ok) throw new Error('Failed to update the recipe');
-        fetchRecipes(token); // Refresh to show updated list
-        setIsEditing(false);
-        setSuccessMessage('Recipe updated successfully!');
-        setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-        console.error("Error updating recipe:", error);
-        setSuccessMessage('Failed to update the recipe. Please try again.');
-        setTimeout(() => setSuccessMessage(''), 5000);
-    }
-};
+    const saveEdit = async () => {
+        const formData = new FormData();
+        formData.append('title', editFormData.title);
+        formData.append('description', editFormData.description);
+        formData.append('ingredients', editFormData.ingredients);
+        formData.append('instructions', editFormData.instructions);
+        if (editFormData.image) {
+            formData.append('recipeImage', editFormData.image);
+        }
+    
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = user ? user.token : null;
+    
+        try {
+            const response = await fetch(`http://localhost:3000/recipes/${editFormData.recipe_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+    
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error("Error updating recipe:", errorResponse);
+                // Display the error message from the response if available, or a generic error message
+                setSuccessMessage(errorResponse.message || 'Failed to update the recipe. Please try again.');
+                setTimeout(() => setSuccessMessage(''), 5000);
+                return; // Exit the function early since the update failed
+            }
+    
+            // If the response is OK, proceed to refresh the recipes list and show a success message
+            fetchRecipes(token); // Refresh to show updated list
+            setIsEditing(false);
+            setSuccessMessage('Recipe updated successfully!');
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (error) {
+            console.error("Error updating recipe:", error);
+            setSuccessMessage('Failed to update the recipe. Please try again.');
+            setTimeout(() => setSuccessMessage(''), 5000);
+        }
+    };
 
     const deleteRecipe = async (recipeId) => {
         const token = localStorage.getItem('token');
@@ -127,7 +148,7 @@ const saveEdit = async () => {
                 <Link to="/user" className="btn">View Profile</Link>
             </div>
             {isEditing && (
-                <form onSubmit={(e) => e.preventDefault()} className="form-container">
+            <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data" className="form-container">
                     <div className="form-control">
                         <label>Title</label>
                         <input
@@ -172,12 +193,12 @@ const saveEdit = async () => {
                         />
                     </div>
                     <div className="form-control">
-                        <label htmlFor="image">Recipe Image</label>
-                        <input
-                            type="file"
-                            name="image"
-                            onChange={handleEditFormChange} // Updated to handle file selection
-                        />
+                    <label htmlFor="image">Recipe Image</label>
+                    <input
+                    type="file"
+                     name="recipeImage" // This name now matches the server expectation
+                     onChange={handleEditFormChange}
+                    />
                     </div>
 
                     <button type="button" onClick={saveEdit} className="btn">Save</button>

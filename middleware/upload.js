@@ -1,7 +1,6 @@
 // Import multer
 const multer = require('multer');
-
-const path = require('path'); // Add this line
+const path = require('path');
 
 // Define storage options
 const storage = multer.diskStorage({
