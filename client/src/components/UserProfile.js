@@ -16,7 +16,7 @@ const UserProfile = () => {
       const imageUrl = user.profile_image_path ? `http://localhost:3000/${user.profile_image_path}` : '/path/to/default/profileImage';
       setProfileImageUrl(imageUrl);
     } else {
-      navigate('/login');
+      navigate('/');
     }
   }, [navigate]);
 
@@ -85,7 +85,7 @@ const UserProfile = () => {
         <button type="submit" className="btn btn-primary" disabled={loading}>Update Profile</button>
       </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={() => { localStorage.removeItem('user'); navigate('/login'); }} className="btn btn-secondary" disabled={loading}>Logout</button>
+      <button onClick={() => { localStorage.removeItem('user'); navigate('/'); }} className="btn btn-secondary" disabled={loading}>Logout</button>
       <Link to="/dashboard" className="btn">Back to Dashboard</Link>
     </div>
   );

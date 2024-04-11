@@ -16,6 +16,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log('Checking user token on dashboard:', localStorage.getItem('token'));
         const user = JSON.parse(localStorage.getItem('user'));
         const token = user ? user.token : null;
         if (!token) {
