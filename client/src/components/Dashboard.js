@@ -50,6 +50,11 @@ const Dashboard = () => {
             ingredients: recipe.ingredients || '',
             instructions: recipe.instructions || '',
         });
+
+        // Scroll to the top of the page or to the top of the form
+         window.scrollTo(0, 0); // This scrolls to the top of the page
+        // If the form is not at the very top of the page, you might need to adjust the second argument to scrollTo to the pixel height where the form begins.
+
     };
 
     const handleEditFormChange = (event) => {
