@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 const UserProfile = () => {
-  const { currentUser, logout, updateProfile, getProfile } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,24 +10,15 @@ const UserProfile = () => {
   const [profileImageUrl, setProfileImageUrl] = useState('');
 
   useEffect(() => {
-    if (currentUser) {
-      setNewEmail(currentUser.email);
-      // Assuming the path is stored in currentUser.profileImagePath
-      // Adjust the path as needed based on how your backend serves images
-      setProfileImageUrl(currentUser.profileImagePath);
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.token) {
+      setNewEmail(user.email);
+      const imageUrl = user.profile_image_path ? `http://localhost:3000/${user.profile_image_path}` : '/path/to/default/profileImage';
+      setProfileImageUrl(imageUrl);
+    } else {
+      navigate('/login');
     }
-  }, [currentUser]);
-
-  const handleLogout = async () => {
-    setError('');
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed', error);
-      setError('Logout failed. Please try again.');
-    }
-  };
+  }, [navigate]);
 
   const handleFileChange = (event) => {
     setProfileImage(event.target.files[0]);
@@ -40,6 +29,9 @@ const UserProfile = () => {
     setError('');
     setLoading(true);
 
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user ? user.token : null;
+
     const formData = new FormData();
     formData.append('email', newEmail);
     if (profileImage) {
@@ -47,12 +39,25 @@ const UserProfile = () => {
     }
 
     try {
-      await updateProfile(formData); // Ensure you have a method to handle profile update including image
-      alert('Profile updated successfully!');
-      // Optionally, refetch profile to update UI
-      getProfile().then(updatedUser => {
-        setProfileImageUrl(updatedUser.profileImagePath);
+      const response = await fetch('http://localhost:3000/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedUserResponse = await response.json();
+      // Ensure the token is preserved in the updated user information
+      const updatedUser = { ...updatedUserResponse.user, token: user.token };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Update the component state to reflect the new profile image path
+      setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
+      alert('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile', error);
       setError('Failed to update profile. Please try again.');
@@ -61,21 +66,17 @@ const UserProfile = () => {
     }
   };
 
-  if (!currentUser) {
-    return <div>Please log in to view this page.</div>;
-  }
-
   return (
     <div className="user-profile-container centered-content">
       <h1>User Profile</h1>
       {profileImageUrl && (
-        <img src={profileImageUrl} alt="Profile" className="profile-image" />
+        <img src={profileImageUrl} alt="Profile" style={{ width: '200px', height: 'auto' }} className="profile-image" />
       )}
-      <p>Email: {currentUser.email}</p>
+      <p>Email: {newEmail}</p>
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-control">
-          <label>New Email:</label>
-          <input type="email"value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} />
+          <label>Update Email:</label>
+          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} />
         </div>
         <div className="form-control">
           <label>Profile Image:</label>
@@ -84,7 +85,7 @@ const UserProfile = () => {
         <button type="submit" className="btn btn-primary" disabled={loading}>Update Profile</button>
       </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={handleLogout} className="btn btn-secondary" disabled={loading}>Logout</button>
+      <button onClick={() => { localStorage.removeItem('user'); navigate('/login'); }} className="btn btn-secondary" disabled={loading}>Logout</button>
       <Link to="/dashboard" className="btn">Back to Dashboard</Link>
     </div>
   );

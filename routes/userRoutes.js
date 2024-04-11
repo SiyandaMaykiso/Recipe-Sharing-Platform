@@ -13,8 +13,8 @@ router.post('/login', userController.login);
 // Fetch user profile (Protected)
 router.get('/user/profile', authenticate, userController.getProfile);
 
-// Update user profile (Protected)
-router.put('/user/profile', authenticate, userController.updateProfile);
+// Update user profile (Protected) with profile image upload
+router.put('/user/profile', authenticate, upload.single('profileImage'), userController.updateProfile);
 
 // Delete user account (Protected)
 router.delete('/user/delete', authenticate, userController.deleteAccount);
@@ -22,20 +22,6 @@ router.delete('/user/delete', authenticate, userController.deleteAccount);
 // A sample protected route that checks for a valid JWT token
 router.get('/protected', authenticate, (req, res) => {
   res.json({ message: 'Access to protected data', user: req.user });
-});
-
-// Route for profile picture upload
-router.post('/profile/upload', authenticate, upload.single('profileImage'), (req, res) => {
-  if (req.file) {
-    // Process the file, save the file path to the user's profile, etc.
-    res.json({
-      success: true,
-      message: 'Profile picture uploaded successfully!',
-      filePath: req.file.path
-    });
-  } else {
-    res.status(400).send('No file uploaded.');
-  }
 });
 
 module.exports = router;

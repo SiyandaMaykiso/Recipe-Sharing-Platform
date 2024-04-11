@@ -38,18 +38,31 @@ const User = {
   },
 
   async update(userId, updateFields) {
+    // Exclude keys where value is null or undefined
+    const fieldsToUpdate = Object.entries(updateFields).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+  
+    if (Object.keys(fieldsToUpdate).length === 0) {
+      throw new Error("No valid fields provided for update");
+    }
+  
     let query = 'UPDATE Users SET ';
     const queryParams = [];
     const queryParts = [];
-
-    Object.keys(updateFields).forEach((field, index) => {
-      queryParts.push(`${field} = $${index + 1}`);
-      queryParams.push(updateFields[field]);
+  
+    Object.keys(fieldsToUpdate).forEach((field, index) => {
+      const columnName = field === 'profileImagePath' ? 'profile_image_path' : field;
+      queryParts.push(`${columnName} = $${index + 1}`);
+      queryParams.push(fieldsToUpdate[field]);
     });
-
+  
     query += queryParts.join(', ') + ' WHERE user_id = $' + (queryParams.length + 1) + ' RETURNING *';
     queryParams.push(userId);
-
+  
     try {
       const { rows } = await db.query(query, queryParams);
       return rows.length > 0 ? rows[0] : null;

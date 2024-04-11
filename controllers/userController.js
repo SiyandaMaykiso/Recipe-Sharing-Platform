@@ -83,37 +83,41 @@ exports.getProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const { password, ...userInfo } = user; // Exclude password from the response
-        res.json(userInfo);
+
+        // Return user data excluding password
+        const { password, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user profile', error: error.message });
     }
 };
-
-// Update user profile to include profile picture handling
+// Update user profile including profile picture
 exports.updateProfile = async (req, res) => {
     const userId = req.user.userId; // Get userId from the authenticated user
-    const { username, email } = req.body;
-    const profileImagePath = req.file ? req.file.path : null; // Access the uploaded file path
+    let updateFields = {};
 
-    try {
-        let updateFields = {};
-        if (username) updateFields.username = username;
-        if (email) updateFields.email = email;
-        if (profileImagePath) updateFields.profileImagePath = profileImagePath; // Add profile image path to update fields if file is uploaded
+    // Check for a profile picture upload and update accordingly
+    if (req.file) {
+        updateFields.profile_image_path = req.file.path; // Use the correct database column name
+    }
 
-        const updatedUser = await User.update(userId, updateFields);
+    // Perform the update only if there are fields to update
+    if (Object.keys(updateFields).length > 0) {
+        try {
+            const updatedUser = await User.update(userId, updateFields);
 
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            // Respond with success message. Consider excluding sensitive info from the response.
+            res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+        } catch (error) {
+            res.status(500).json({ message: 'Error updating profile', error: error.message });
         }
-
-        // Optionally, return the updated user information, excluding sensitive data
-        const { password, ...updatedUserInfo } = updatedUser;
-        
-        res.json({ message: 'Profile updated successfully', user: updatedUserInfo });
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating profile', error: error.message });
+    } else {
+        // If no fields were provided for update, return an error message
+        res.status(400).json({ message: 'No update fields provided' });
     }
 };
 
