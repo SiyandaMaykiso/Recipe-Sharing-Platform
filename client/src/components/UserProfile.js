@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, PinterestShareButton, PinterestIcon } from 'react-share';
+import { MdEmail } from 'react-icons/md'; // Import the email icon
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -8,6 +10,12 @@ const UserProfile = () => {
   const [newEmail, setNewEmail] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState('');
+  const shareUrl = window.location.href; // URL to share
+  const title = "Check out my profile on Recipe Sharing Platform!"; // Custom message for sharing
+
+  const emailSubject = encodeURIComponent("Check out my profile on the Recipe Sharing Platform!");
+  const emailBody = encodeURIComponent(`Hi there,\n\nI wanted to share my profile with you on the Recipe Sharing Platform. Check it out here: ${shareUrl}\n\nBest regards,\n${newEmail}`);
+  const mailtoLink = `mailto:?subject=${emailSubject}&body=${emailBody}`;
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -52,10 +60,8 @@ const UserProfile = () => {
       }
 
       const updatedUserResponse = await response.json();
-      // Ensure the token is preserved in the updated user information
       const updatedUser = { ...updatedUserResponse.user, token: user.token };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Update the component state to reflect the new profile image path
       setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
       alert('Profile updated successfully!');
     } catch (error) {
@@ -66,6 +72,14 @@ const UserProfile = () => {
     }
   };
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Link copied to clipboard!');
+    }, (err) => {
+      console.error('Failed to copy: ', err);
+    });
+  };
+
   return (
     <div className="user-profile-container centered-content">
       <h1>User Profile</h1>
@@ -73,6 +87,21 @@ const UserProfile = () => {
         <img src={profileImageUrl} alt="Profile" style={{ width: '200px', height: 'auto' }} className="profile-image" />
       )}
       <p>Email: {newEmail}</p>
+      <div>
+        <FacebookShareButton url={shareUrl} quote={title}>
+          <FacebookIcon size={32} round />
+        </FacebookShareButton>
+        <TwitterShareButton url={shareUrl} title={title}>
+          <TwitterIcon size={32} round />
+        </TwitterShareButton>
+        <PinterestShareButton url={shareUrl} description={title} media={profileImageUrl}>
+          <PinterestIcon size={32} round />
+        </PinterestShareButton>
+        <a href={mailtoLink} className="email-share-button">
+          <MdEmail size={32} style={{ color: 'grey', borderRadius: '50%', background: 'white', padding: '5px' }} />
+        </a>
+        <button onClick={handleCopyLink} className="btn">Copy Link of Profile</button> {/* Button to copy the link */}
+      </div>
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-control">
           <label>Update Email:</label>
