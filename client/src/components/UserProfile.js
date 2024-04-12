@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, PinterestShareButton, PinterestIcon } from 'react-share';
-import { MdEmail } from 'react-icons/md'; // Import the email icon
+import { MdEmail } from 'react-icons/md';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -10,8 +10,8 @@ const UserProfile = () => {
   const [newEmail, setNewEmail] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const shareUrl = window.location.href; // URL to share
-  const title = "Check out my profile on Recipe Sharing Platform!"; // Custom message for sharing
+  const shareUrl = window.location.href;
+  const title = "Check out my profile on Recipe Sharing Platform!";
 
   const emailSubject = encodeURIComponent("Check out my profile on the Recipe Sharing Platform!");
   const emailBody = encodeURIComponent(`Hi there,\n\nI wanted to share my profile with you on the Recipe Sharing Platform. Check it out here: ${shareUrl}\n\nBest regards,\n${newEmail}`);
@@ -100,7 +100,7 @@ const UserProfile = () => {
         <a href={mailtoLink} className="email-share-button">
           <MdEmail size={32} style={{ color: 'grey', borderRadius: '50%', background: 'white', padding: '5px' }} />
         </a>
-        <button onClick={handleCopyLink} className="btn">Copy Link of Profile</button> {/* Button to copy the link */}
+        <button onClick={handleCopyLink} className="btn">Copy Link of Profile</button>
       </div>
       <form onSubmit={handleSubmit} className="form-container">
         <div className="form-control">

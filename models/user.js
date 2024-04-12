@@ -1,4 +1,4 @@
-const db = require('../db'); // Ensure the path is correctly adjusted to your project structure
+const db = require('../db');
 
 const User = {
   async create(username, email, password) {
@@ -38,7 +38,7 @@ const User = {
   },
 
   async update(userId, updateFields) {
-    // Exclude keys where value is null or undefined
+    
     const fieldsToUpdate = Object.entries(updateFields).reduce((acc, [key, value]) => {
       if (value !== null && value !== undefined) {
         acc[key] = value;

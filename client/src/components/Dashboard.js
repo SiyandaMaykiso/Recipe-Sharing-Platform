@@ -10,7 +10,7 @@ const Dashboard = () => {
         description: '',
         ingredients: '',
         instructions: '',
-        image: null, // Added for image handling
+        image: null,
     });
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
@@ -52,19 +52,17 @@ const Dashboard = () => {
             instructions: recipe.instructions || '',
         });
 
-        // Scroll to the top of the page or to the top of the form
-         window.scrollTo(0, 0); // This scrolls to the top of the page
-        // If the form is not at the very top of the page, you might need to adjust the second argument to scrollTo to the pixel height where the form begins.
+         window.scrollTo(0, 0);
 
     };
 
     const handleEditFormChange = (event) => {
         const { name, value } = event.target;
         if (name === "recipeImage") {
-            // For file input, handle separately
-            handleImageChange(event); // This calls a separate function for handling image change
+            
+            handleImageChange(event);
         } else {
-            // For all other inputs, including textareas for auto-expansion
+           
             setEditFormData(prev => ({ ...prev, [name]: value }));
             if(event.target.tagName.toLowerCase() === 'textarea') {
                 autoExpandTextArea(event.target);
@@ -73,16 +71,16 @@ const Dashboard = () => {
     };
     
     const handleImageChange = (event) => {
-        // Directly updates the state with the file, assuming "image" is the correct field name
+      
         setEditFormData(prevFormData => ({
             ...prevFormData,
-            image: event.target.files[0] // Gets the file from the input field
+            image: event.target.files[0] 
         }));
     };
     
     const autoExpandTextArea = (element) => {
         element.style.height = 'inherit';
-        element.style.height = `${element.scrollHeight}px`; // Adjusts height based on content
+        element.style.height = `${element.scrollHeight}px`; 
     };
 
     const saveEdit = async () => {
@@ -110,14 +108,14 @@ const Dashboard = () => {
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error("Error updating recipe:", errorResponse);
-                // Display the error message from the response if available, or a generic error message
+                
                 setSuccessMessage(errorResponse.message || 'Failed to update the recipe. Please try again.');
                 setTimeout(() => setSuccessMessage(''), 5000);
-                return; // Exit the function early since the update failed
+                return; 
             }
     
-            // If the response is OK, proceed to refresh the recipes list and show a success message
-            fetchRecipes(token); // Refresh to show updated list
+            
+            fetchRecipes(token);
             setIsEditing(false);
             setSuccessMessage('Recipe updated successfully!');
             setTimeout(() => setSuccessMessage(''), 3000);
@@ -138,7 +136,7 @@ const Dashboard = () => {
                 },
             });
             if (!response.ok) throw new Error('Failed to delete the recipe');
-            fetchRecipes(token); // Refresh to show updated list
+            fetchRecipes(token);
         } catch (error) {
             console.error("Error deleting recipe:", error);
         }
@@ -195,14 +193,14 @@ const Dashboard = () => {
                             value={editFormData.instructions}
                             onChange={handleEditFormChange}
                             className="ingredient-input"
-                            style={{ overflow: 'hidden', resize: 'none' }} // Prevent manual resizing
+                            style={{ overflow: 'hidden', resize: 'none' }}
                         />
                     </div>
                     <div className="form-control">
                     <label htmlFor="image">Recipe Image</label>
                     <input
                     type="file"
-                     name="recipeImage" // This name now matches the server expectation
+                     name="recipeImage"
                      onChange={handleEditFormChange}
                     />
                     </div>

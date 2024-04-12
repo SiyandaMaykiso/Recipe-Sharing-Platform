@@ -1,7 +1,7 @@
-const db = require('../db'); // Adjust the path as necessary for your project structure
+const db = require('../db');
 
 const Comment = {
-  // Add a new comment to a recipe
+ 
   async create({ recipeId, userId, commentText }) {
     const query = `
       INSERT INTO Comments (recipe_id, user_id, comment_text, comment_date)
@@ -18,7 +18,6 @@ const Comment = {
     }
   },
 
-  // Get all comments for a recipe
   async findByRecipeId(recipeId) {
     const query = 'SELECT * FROM Comments WHERE recipe_id = $1 ORDER BY comment_date DESC';
     const values = [recipeId];
@@ -31,7 +30,6 @@ const Comment = {
     }
   },
 
-  // Update a comment
   async update(commentId, { commentText }) {
     const query = `
       UPDATE Comments
@@ -52,7 +50,6 @@ const Comment = {
     }
   },
 
-  // Delete a comment
   async delete(commentId) {
     const query = 'DELETE FROM Comments WHERE comment_id = $1 RETURNING *;';
     const values = [commentId];
@@ -68,7 +65,6 @@ const Comment = {
     }
   },
 
-  // Additional methods as needed...
 };
 
 module.exports = Comment;

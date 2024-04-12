@@ -1,7 +1,7 @@
-const db = require('../db'); // Adjust the path based on your project structure
+const db = require('../db');
 
 const Ingredient = {
-  // Add a new ingredient to a recipe
+  
   async create({ recipeId, name, quantity }) {
     const query = `
       INSERT INTO Ingredients (recipe_id, name, quantity)
@@ -18,7 +18,7 @@ const Ingredient = {
     }
   },
 
-  // Get all ingredients for a recipe
+
   async findByRecipeId(recipeId) {
     const query = 'SELECT * FROM Ingredients WHERE recipe_id = $1';
     const values = [recipeId];
@@ -31,7 +31,6 @@ const Ingredient = {
     }
   },
 
-  // Update an ingredient
   async update(ingredientId, { name, quantity }) {
     const query = `
       UPDATE Ingredients
@@ -52,7 +51,6 @@ const Ingredient = {
     }
   },
 
-  // Delete an ingredient
   async delete(ingredientId) {
     const query = 'DELETE FROM Ingredients WHERE ingredient_id = $1 RETURNING *;';
     const values = [ingredientId];
@@ -68,7 +66,6 @@ const Ingredient = {
     }
   },
 
-  // Additional methods as needed...
 };
 
 module.exports = Ingredient;

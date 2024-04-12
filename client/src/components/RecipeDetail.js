@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Now without Link
+import { useParams, useNavigate } from 'react-router-dom';
 
 const RecipeDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
   const [recipe, setRecipe] = useState({});
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [newRating, setNewRating] = useState(0); // Initialize rating as 0
+  const [newRating, setNewRating] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -31,9 +31,9 @@ const RecipeDetail = () => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
   
-    // Retrieve the token from localStorage
-    const token = localStorage.getItem('authToken'); // Updated to use 'authToken'
-    console.log("Token:", token); // Log the token to the console
+    
+    const token = localStorage.getItem('authToken');
+    console.log("Token:", token);
   
     if (!token) {
       console.error("No authentication token found");
@@ -46,45 +46,44 @@ const RecipeDetail = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Correctly include the token in the Authorization header
+        
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ content: newComment }),
       });
   
       if (!response.ok) {
-        const errorResponse = await response.json(); // Assuming the error details are in JSON format
+        const errorResponse = await response.json(); 
         throw new Error(`Failed to post new comment: ${errorResponse.message}`);
       }
       const addedComment = await response.json();
       setComments([...comments, addedComment]);
-      setNewComment(''); // Clear the input field
+      setNewComment('');
     } catch (error) {
       console.error("Error posting new comment:", error.message);
-      setError(error.message); // Set the error state to display the message
+      setError(error.message); 
     }
   };
   
   const handleRatingSubmit = async (e) => {
     e.preventDefault();
   
-    // Retrieve the token from localStorage for the rating submission
-    const token = localStorage.getItem('authToken'); // Updated to use 'authToken'
-    console.log("Token for rating:", token); // Log the token to the console for rating
+    const token = localStorage.getItem('authToken');
+    console.log("Token for rating:", token);
   
     try {
       const response = await fetch(`http://localhost:3000/recipes/${id}/ratings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ rating: newRating }),
       });
 
       if (!response.ok) throw new Error('Failed to post new rating');
-      // Fetch updated ratings here if necessary
-      setNewRating(0); // Reset rating input
+     
+      setNewRating(0);
     } catch (error) {
       setError(error.message);
     }
@@ -92,14 +91,13 @@ const RecipeDetail = () => {
 
   if (error) return <div>Error: {error}</div>;
 
-   // Add 'container' class to align with global styling and improve layout consistency
    return (
     <div className="container recipe-detail-container">
       <button onClick={() => navigate('/dashboard')} className="btn btn-secondary" style={{ marginBottom: '20px' }}>Back to Dashboard</button>
       <div className="recipe-header">
         <h2>{recipe.title}</h2>
         <p>{recipe.description}</p>
-        {/* Consider adding more recipe details here with appropriate styling */}
+        
       </div>
 
       <div className="comments-section">
@@ -137,7 +135,6 @@ const RecipeDetail = () => {
         </form>
       </div>
       
-      {/* Display error messages in a styled div */}
       {error && <div className="error-message">{error}</div>}
     </div>
   );

@@ -9,7 +9,7 @@ const RecipeForm = ({ initialValues }) => {
     const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
-        // Initialize or correct form values on mount or when initialValues change
+       
         setFormValues({
             ...initialValues,
             ingredients: typeof initialValues.ingredients === 'string' ? initialValues.ingredients : '',
@@ -62,7 +62,7 @@ const RecipeForm = ({ initialValues }) => {
             const result = await response.json();
             console.log("Success:", result);
             setSuccessMessage('Recipe successfully uploaded!');
-            resetForm({ values: '' }); // Reset the form with empty values
+            resetForm({ values: '' });
         } catch (error) {
             console.error('Submission error:', error);
             setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
@@ -72,13 +72,12 @@ const RecipeForm = ({ initialValues }) => {
     };
 
     const handleAutoExpand = (event) => {
-      // Reset height and width to auto
+      
       event.target.style.height = 'auto';
       event.target.style.width = 'auto';
 
-      // Set height to the scroll height of the content
       event.target.style.height = `${event.target.scrollHeight}px`;
-      // Set width to the scroll width of the content
+   
       event.target.style.width = `${event.target.scrollWidth}px`;
   };
 

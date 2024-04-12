@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require('../models/user'); // Adjust the path as necessary
+const User = require('../models/user');
 
 const generateAccessToken = (userId, email) => {
     return jwt.sign(
@@ -10,7 +10,6 @@ const generateAccessToken = (userId, email) => {
     );
 };
 
-// User registration
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
     try {
@@ -27,7 +26,6 @@ exports.register = async (req, res) => {
     }
 };
 
-// User login with JWT
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -47,20 +45,18 @@ exports.login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        // Exclude password and any other sensitive info from the response
         const { password: userPassword, ...userInfo } = user;
 
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: userInfo // Include user info in the response
+            user: userInfo
         });
     } catch (error) {
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 };
 
-// JWT Middleware for protected routes
 exports.authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
@@ -76,7 +72,6 @@ exports.authenticate = (req, res, next) => {
     });
 };
 
-// Fetch user profile
 exports.getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
@@ -84,24 +79,21 @@ exports.getProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Return user data excluding password
         const { password, ...userWithoutPassword } = user;
         res.json(userWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user profile', error: error.message });
     }
 };
-// Update user profile including profile picture
+
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.userId; // Get userId from the authenticated user
+    const userId = req.user.userId;
     let updateFields = {};
 
-    // Check for a profile picture upload and update accordingly
     if (req.file) {
-        updateFields.profile_image_path = req.file.path; // Use the correct database column name
+        updateFields.profile_image_path = req.file.path;
     }
 
-    // Perform the update only if there are fields to update
     if (Object.keys(updateFields).length > 0) {
         try {
             const updatedUser = await User.update(userId, updateFields);
@@ -110,22 +102,21 @@ exports.updateProfile = async (req, res) => {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            // Respond with success message. Consider excluding sensitive info from the response.
             res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
         } catch (error) {
             res.status(500).json({ message: 'Error updating profile', error: error.message });
         }
     } else {
-        // If no fields were provided for update, return an error message
+    
         res.status(400).json({ message: 'No update fields provided' });
     }
 };
 
-// Delete user account
+
 exports.deleteAccount = async (req, res) => {
     try {
         await User.delete(req.user.userId);
-        res.status(204).send(); // No content to send back
+        res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting account', error: error.message });
     }
@@ -139,13 +130,11 @@ exports.refreshToken = async (req, res) => {
     }
 
     try {
-        // Verify the refresh token
+        
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-        // If refresh token is valid, generate a new access token
         const accessToken = generateAccessToken(decoded.userId, decoded.email);
 
-        // Send the new access token to the client
         res.json({ accessToken });
     } catch (error) {
         console.error('Error refreshing token:', error);

@@ -1,4 +1,4 @@
-const db = require('../db'); // Adjust path as necessary
+const db = require('../db');
 
 const Recipe = {
   async create({ userId, title, description, ingredients, instructions, imagePath }) {
@@ -20,12 +20,12 @@ const Recipe = {
 
   async findById(recipeId) {
     const query = 'SELECT * FROM recipes WHERE recipe_id = $1';
-    const values = [parseInt(recipeId, 10)]; // Ensure recipeId is an integer
+    const values = [parseInt(recipeId, 10)];
 
     try {
       const { rows } = await db.query(query, values);
       if (rows.length === 0) {
-        return null; // Return null if recipe is not found
+        return null;
       }
       return rows[0];
     } catch (error) {
@@ -35,12 +35,11 @@ const Recipe = {
   },
 
   async update(recipeId, { title, description, ingredients, instructions, imagePath }) {
-    const id = parseInt(recipeId, 10); // Ensure recipeId is an integer
+    const id = parseInt(recipeId, 10);
     if (isNaN(id)) {
       throw new Error('Invalid recipe ID');
     }
   
-    // Verify the recipe exists before attempting to update
     const exists = await this.findById(id);
     if (!exists) {
       throw new Error('Recipe not found');
@@ -48,10 +47,9 @@ const Recipe = {
   
     const updateData = { title, description, ingredients, instructions, image_path: imagePath };
   
-    // Construct SET clause dynamically based on non-undefined values in updateData
     const setClause = Object.entries(updateData)
       .filter(([key, value]) => value !== undefined)
-      .map(([key, value], index) => `${key} = $${index + 2}`) // Start index at $2 for id
+      .map(([key, value], index) => `${key} = $${index + 2}`)
       .join(', ');
   
     const query = `
@@ -73,16 +71,16 @@ const Recipe = {
   },
 
   async delete(recipeId) {
-    const id = parseInt(recipeId, 10); // Ensure recipeId is an integer
+    const id = parseInt(recipeId, 10);
     const query = 'DELETE FROM recipes WHERE recipe_id = $1 RETURNING *;';
     const values = [id];
 
     try {
       const { rows } = await db.query(query, values);
       if (rows.length === 0) {
-        return false; // Recipe not found or not deleted
+        return false;
       }
-      return true; // Recipe deleted
+      return true;
     } catch (error) {
       console.error('Error deleting recipe:', error);
       throw error;
@@ -95,7 +93,7 @@ const Recipe = {
 
     if (userId) {
       query += ' WHERE user_id = $1';
-      values.push(parseInt(userId, 10)); // Ensure userId is an integer
+      values.push(parseInt(userId, 10));
     }
 
     try {

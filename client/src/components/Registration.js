@@ -28,11 +28,9 @@ function Registration() {
       const data = await response.json();
       console.log('Registration successful:', data);
 
-      // Save user details and token if backend response includes these
       if (data.user && data.token) {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
-        // Specifically save the user_id for later use
         localStorage.setItem('user_id', data.user.user_id);
       } else {
         console.error('User details or token not provided in registration response');
@@ -49,7 +47,6 @@ function Registration() {
     <div>
       <h2>Registration Form</h2>
       <form onSubmit={handleSubmit}>
-        {/* Form fields */}
         <div>
           <label htmlFor="name">Name:</label>
           <input type="text" id="name" required value={name} onChange={(e) => setName(e.target.value)} />

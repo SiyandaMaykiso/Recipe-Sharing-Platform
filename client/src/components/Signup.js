@@ -11,9 +11,7 @@ function Signup() {
     e.preventDefault();
     try {
       await signup(email, password);
-      // Handle post-signup logic, like redirecting to a dashboard
     } catch (error) {
-      // Handle errors, like showing a message to the user
     }
   };
 

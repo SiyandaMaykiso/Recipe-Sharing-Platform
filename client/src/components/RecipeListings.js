@@ -11,7 +11,7 @@ const RecipeListings = () => {
         const response = await fetch('http://localhost:3000/recipes');
         if (!response.ok) throw new Error('Failed to fetch recipes');
         const data = await response.json();
-        console.log('Fetched Recipes:', data); // This will log fetched recipes
+        console.log('Fetched Recipes:', data);
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);

@@ -1,11 +1,9 @@
-const Rating = require('../models/rating'); // Adjust the path as necessary
+const Rating = require('../models/rating');
 
-// Add a new rating
-// Inside ratingsController.js
 exports.addRating = async (req, res) => {
-    const { recipeId } = req.params; // Extracting recipeId from URL parameters
-    const userId = req.user.userId; // Assuming this is set by your authentication middleware
-    const { rating } = req.body; // Extracting rating from the request body
+    const { recipeId } = req.params;
+    const userId = req.user.userId; 
+    const { rating } = req.body;
 
     try {
         const newRating = await Rating.create({ recipeId, userId, rating });
@@ -17,7 +15,6 @@ exports.addRating = async (req, res) => {
 
 
 
-// Update an existing rating
 exports.updateRating = async (req, res) => {
     const { ratingId } = req.params;
     const { rating } = req.body;
@@ -33,7 +30,6 @@ exports.updateRating = async (req, res) => {
     }
 };
 
-// Get all ratings for a recipe
 exports.getRatingsByRecipe = async (req, res) => {
     const { recipeId } = req.params;
     try {

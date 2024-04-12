@@ -1,9 +1,8 @@
-const Ingredient = require('../models/ingredient'); // Adjust the path as necessary
+const Ingredient = require('../models/ingredient');
 
-// Add a new ingredient to a recipe
 exports.addIngredient = async (req, res) => {
-    const { recipeId } = req.params; // Extracting recipeId from URL parameters
-    const { name, quantity } = req.body; // Assume these are provided in the request
+    const { recipeId } = req.params; 
+    const { name, quantity } = req.body;
     try {
         const newIngredient = await Ingredient.create({ recipeId, name, quantity });
         res.status(201).json({ message: 'Ingredient added successfully', ingredient: newIngredient });
@@ -12,10 +11,9 @@ exports.addIngredient = async (req, res) => {
     }
 };
 
-// Update an existing ingredient
 exports.updateIngredient = async (req, res) => {
     const { ingredientId } = req.params;
-    const { name, quantity } = req.body; // Assume these are the fields to update
+    const { name, quantity } = req.body;
     try {
         const updatedIngredient = await Ingredient.update(ingredientId, { name, quantity });
         if (updatedIngredient) {
@@ -28,18 +26,16 @@ exports.updateIngredient = async (req, res) => {
     }
 };
 
-// Delete an ingredient
 exports.deleteIngredient = async (req, res) => {
     const { ingredientId } = req.params;
     try {
         await Ingredient.delete(ingredientId);
-        res.status(204).send(); // No content to send back upon successful deletion
+        res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting ingredient', error: error.message });
     }
 };
 
-// Get all ingredients for a recipe
 exports.getIngredientsByRecipe = async (req, res) => {
     const { recipeId } = req.params;
     try {

@@ -1,4 +1,3 @@
-// models/index.js
 const User = require('./user');
 const Recipe = require('./recipe');
 const Ingredient = require('./ingredient');
@@ -11,5 +10,5 @@ module.exports = {
   Ingredient,
   Comment,
   Rating,
-  // any shared utilities or common functions can also be exported here
+
 };

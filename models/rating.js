@@ -1,7 +1,7 @@
-const db = require('../db'); // Ensure the path is correctly adjusted to your project structure
+const db = require('../db');
 
 const Rating = {
-  // Add a new rating to a recipe by a user
+ 
   async create({ recipeId, userId, rating }) {
     const query = `
       INSERT INTO Ratings (recipe_id, user_id, rating, rating_date)
@@ -18,7 +18,6 @@ const Rating = {
     }
   },
 
-  // Get all ratings for a recipe
   async findByRecipeId(recipeId) {
     const query = 'SELECT * FROM Ratings WHERE recipe_id = $1';
     const values = [recipeId];
@@ -31,7 +30,6 @@ const Rating = {
     }
   },
 
-  // Update a rating
   async update(ratingId, { rating }) {
     const query = `
       UPDATE Ratings
@@ -52,7 +50,6 @@ const Rating = {
     }
   },
 
-  // Delete a rating
   async delete(ratingId) {
     const query = 'DELETE FROM Ratings WHERE rating_id = $1 RETURNING *;';
     const values = [ratingId];
@@ -68,7 +65,6 @@ const Rating = {
     }
   },
 
-  // Additional methods as needed...
 };
 
 module.exports = Rating;

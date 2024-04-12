@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -25,11 +25,10 @@ function Login() {
   
         const data = await response.json();
   
-        // Assuming the response includes a user object with a user_id and a token
         if (data.token && data.user && data.user.user_id) {
-            // Store the user object including both user_id and token in localStorage
+            
             localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));console.log('Login Token:', data.token); // Log the token to compare later
-navigate('/dashboard'); // Navigate to dashboard after successful login
+navigate('/dashboard');
         } else {
             throw new Error('Login response missing user ID or token');
         }

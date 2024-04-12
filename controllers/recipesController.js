@@ -1,4 +1,4 @@
-const Recipe = require('../models/recipe'); // Adjust the path as necessary
+const Recipe = require('../models/recipe');
 
 exports.create = async (req, res) => {
     try {
@@ -6,13 +6,12 @@ exports.create = async (req, res) => {
         const user_id = parseInt(req.body.user_id);
         const imagePath = req.file ? req.file.path : '';
 
-        // No need to parse ingredients and instructions since they are strings
         const recipe = await Recipe.create({
             userId: user_id,
             title,
             description,
-            ingredients, // Directly passed as strings
-            instructions, // Directly passed as strings
+            ingredients, 
+            instructions,
             imagePath,
         });
 
@@ -23,7 +22,6 @@ exports.create = async (req, res) => {
     }
 };
 
-// List all recipes
 exports.listAll = async (req, res) => {
     try {
         const recipes = await Recipe.findAll();
@@ -34,7 +32,6 @@ exports.listAll = async (req, res) => {
     }
 };
 
-// Get a single recipe by ID
 exports.findById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -45,20 +42,19 @@ exports.findById = async (req, res) => {
             res.status(404).json({ message: 'Recipe not found' });
         }
     } catch (error) {
-        console.error('Error retrieving recipe:', error.stack); // Enhanced error logging
+        console.error('Error retrieving recipe:', error.stack);
         res.status(500).json({ message: 'Error retrieving recipe', error: error.message });
     }
 };
 
-// Update a recipe
 exports.update = async (req, res) => {
-    console.log("req.file:", req.file); // Log to see if the file is being received
+    console.log("req.file:", req.file);
     const { id } = req.params;
     const { title, description, ingredients, instructions } = req.body;
     let updateData = { title, description, ingredients, instructions };
 
     if (req.file) {
-        const imagePath = req.file.path; // Only update imagePath if a new file is uploaded
+        const imagePath = req.file.path; 
         updateData.imagePath = imagePath;
     }
 
@@ -77,18 +73,17 @@ exports.update = async (req, res) => {
 };
 
 
-// Delete a recipe
 exports.delete = async (req, res) => {
     const { id } = req.params;
     try {
         const result = await Recipe.delete(id);
         if (result) {
-            res.status(204).send(); // No content to send back for a successful deletion
+            res.status(204).send();
         } else {
             res.status(404).json({ message: 'Recipe not found' });
         }
     } catch (error) {
-        console.error('Error deleting recipe:', error.stack); // Enhanced error logging
+        console.error('Error deleting recipe:', error.stack);
         res.status(500).json({ message: 'Error deleting recipe', error: error.message });
     }
 };
