@@ -28,49 +28,40 @@ const RecipeDetail = () => {
     }
     fetchData();
   }, [id]);
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-  
-    
     const token = localStorage.getItem('authToken');
-    console.log("Token:", token);
-  
     if (!token) {
-      console.error("No authentication token found");
       setError("You must be logged in to post a comment.");
       return;
     }
-  
+
     try {
       const response = await fetch(`http://localhost:3000/recipes/${id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ content: newComment }),
       });
-  
+
       if (!response.ok) {
-        const errorResponse = await response.json(); 
+        const errorResponse = await response.json();
         throw new Error(`Failed to post new comment: ${errorResponse.message}`);
       }
       const addedComment = await response.json();
       setComments([...comments, addedComment]);
       setNewComment('');
     } catch (error) {
-      console.error("Error posting new comment:", error.message);
-      setError(error.message); 
+      setError(error.message);
     }
   };
-  
+
   const handleRatingSubmit = async (e) => {
     e.preventDefault();
-  
     const token = localStorage.getItem('authToken');
-    console.log("Token for rating:", token);
-  
     try {
       const response = await fetch(`http://localhost:3000/recipes/${id}/ratings`, {
         method: 'POST',
@@ -82,7 +73,6 @@ const RecipeDetail = () => {
       });
 
       if (!response.ok) throw new Error('Failed to post new rating');
-     
       setNewRating(0);
     } catch (error) {
       setError(error.message);
@@ -91,14 +81,27 @@ const RecipeDetail = () => {
 
   if (error) return <div>Error: {error}</div>;
 
-   return (
+  return (
     <div className="container recipe-detail-container">
-      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary" style={{ marginBottom: '20px' }}>Back to Dashboard</button>
-      <div className="recipe-header">
-        <h2>{recipe.title}</h2>
-        <p>{recipe.description}</p>
-        
-      </div>
+      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">Back to Dashboard</button>
+      {recipe && (
+        <>
+          <h2>{recipe.title}</h2>
+          <p>{recipe.description}</p>
+          <h3>Ingredients</h3>
+<ul>
+  {recipe.ingredients ? recipe.ingredients.split('\n').map((ingredient, index) => (
+    <li key={index}>{ingredient}</li>
+  )) : <li>No ingredients listed.</li>}
+</ul>
+<h3>Instructions</h3>
+<ol>
+  {recipe.instructions ? recipe.instructions.split('\n').map((step, index) => (
+    <li key={index}>{step}</li>
+  )) : <li>No instructions provided.</li>}
+</ol>
+        </>
+      )}
 
       <div className="comments-section">
         <h3>Comments</h3>
