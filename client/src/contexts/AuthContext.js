@@ -7,13 +7,13 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
-  const [authToken, setAuthToken] = useState(localStorage.getItem('token') || '');
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
-    localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(currentUser));
-  }, [authToken, currentUser]);
+    localStorage.setItem('token', authToken);
+  }, [currentUser, authToken]);
 
   const login = async (email, password) => {
     try {
@@ -24,16 +24,14 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to log in');
       }
-  
+
       const data = await response.json();
-      setCurrentUser(data.user); // Update state with the user's information
-      setAuthToken(data.token); // **This line uses setAuthToken**
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      setCurrentUser(data.user);
+      setAuthToken(data.token);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -41,11 +39,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Logout implementation...
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+    setAuthToken('');
+  };
+
+  const setUserAndToken = (user, token) => {
+    setCurrentUser(user);
+    setAuthToken(token);
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', token);
   };
 
   const getAuthHeader = () => {
-    // Helper function to get the auth header
     return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
   };
 
@@ -55,7 +62,6 @@ export const AuthProvider = ({ children }) => {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,
-          // Note: Do not set 'Content-Type' here. Let the browser set it for FormData
         },
         body: formData,
       });
@@ -66,11 +72,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       const updatedUser = await response.json();
-      setCurrentUser(updatedUser); // Update the currentUser state with the updated data
-      localStorage.setItem('user', JSON.stringify(updatedUser)); // Also update local storage
+      setCurrentUser(updatedUser);
     } catch (error) {
-      console.error("Failed to update profile:", error.message);
-      throw error; // Let the calling code handle the error
+      console.error("Failed to update profile:", error);
+      throw error;
     }
   };
 
@@ -79,7 +84,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     getAuthHeader,
-    updateProfile, // Make the updateProfile method available to components
+    updateProfile,
+    setUserAndToken,  // Make sure to expose this new method
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

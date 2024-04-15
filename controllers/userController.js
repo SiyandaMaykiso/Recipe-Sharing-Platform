@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
-const generateAccessToken = (userId, email) => {
+const generateAccessToken = (id, email) => {
     return jwt.sign(
-        { userId, email },
+        { id, email },  // Standardized payload to use 'id'
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
     );
@@ -20,7 +20,17 @@ exports.register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create(username, email, hashedPassword);
-        res.status(201).json({ message: 'User created successfully', userId: newUser.user_id });
+        const token = generateAccessToken(newUser.user_id, newUser.email); // Consistently using the same JWT payload structure
+
+        res.status(201).json({
+            message: 'User created successfully',
+            user: {
+                userId: newUser.user_id,
+                username: newUser.username,
+                email: newUser.email
+            },
+            token: token
+        });
     } catch (error) {
         res.status(500).json({ message: 'Error registering new user', error: error.message });
     }
@@ -39,13 +49,9 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Incorrect password' });
         }
 
-        const token = jwt.sign(
-            { userId: user.user_id, email: user.email },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
+        const token = generateAccessToken(user.user_id, user.email);  // Use the revised function here
 
-        const { password: userPassword, ...userInfo } = user;
+        const { password: _, ...userInfo } = user;  // Properly omit the password from the response
 
         res.status(200).json({
             message: 'Login successful',
@@ -67,19 +73,19 @@ exports.authenticate = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) return res.status(403).json({ message: 'Token is not valid' });
-        req.user = decoded;
+        req.user = decoded; // Ensuring that decoded token information is attached to the request object
         next();
     });
 };
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user.id); // Adjusted to use 'id' from the standardized token payload
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const { password, ...userWithoutPassword } = user;
+        const { password: _, ...userWithoutPassword } = user;
         res.json(userWithoutPassword);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user profile', error: error.message });
@@ -87,7 +93,7 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.userId;
+    const userId = req.user.id; // Using 'id' from token
     let updateFields = {};
 
     if (req.file) {
@@ -97,7 +103,6 @@ exports.updateProfile = async (req, res) => {
     if (Object.keys(updateFields).length > 0) {
         try {
             const updatedUser = await User.update(userId, updateFields);
-
             if (!updatedUser) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -107,15 +112,13 @@ exports.updateProfile = async (req, res) => {
             res.status(500).json({ message: 'Error updating profile', error: error.message });
         }
     } else {
-    
         res.status(400).json({ message: 'No update fields provided' });
     }
 };
 
-
 exports.deleteAccount = async (req, res) => {
     try {
-        await User.delete(req.user.userId);
+        await User.delete(req.user.id); // Using 'id' from token
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting account', error: error.message });
@@ -130,10 +133,8 @@ exports.refreshToken = async (req, res) => {
     }
 
     try {
-        
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-        const accessToken = generateAccessToken(decoded.userId, decoded.email);
+        const accessToken = generateAccessToken(decoded.id, decoded.email); // Corrected to use 'id'
 
         res.json({ accessToken });
     } catch (error) {

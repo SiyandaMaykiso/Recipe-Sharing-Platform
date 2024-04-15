@@ -87,20 +87,15 @@ const Recipe = {
     }
   },
 
-  async findAll({ userId } = {}) {
-    let query = 'SELECT * FROM recipes';
-    const values = [];
-
-    if (userId) {
-      query += ' WHERE user_id = $1';
-      values.push(parseInt(userId, 10));
-    }
+  async findByUserId(userId) {
+    const query = 'SELECT * FROM recipes WHERE user_id = $1 ORDER BY creation_date DESC';
+    const values = [userId];
 
     try {
       const { rows } = await db.query(query, values);
       return rows;
     } catch (error) {
-      console.error('Error listing recipes:', error);
+      console.error('Error finding recipes by user ID:', error);
       throw error;
     }
   },

@@ -1,16 +1,23 @@
 const Recipe = require('../models/recipe');
 
 exports.create = async (req, res) => {
+    console.log("Received JWT decoded data:", req.user); // This will log the decoded JWT data
     try {
         const { title, description, ingredients, instructions } = req.body;
-        const user_id = parseInt(req.body.user_id);
-        const imagePath = req.file ? req.file.path : '';
+        const userId = req.user.userId; // Corrected to use 'userId'
+        console.log("User ID from JWT:", userId); // Log the user ID to verify it's passed correctly
 
+        if (!userId) {
+            console.error("User ID is missing");
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const imagePath = req.file ? req.file.path : '';
         const recipe = await Recipe.create({
-            userId: user_id,
+            userId,
             title,
             description,
-            ingredients, 
+            ingredients,
             instructions,
             imagePath,
         });
@@ -22,9 +29,11 @@ exports.create = async (req, res) => {
     }
 };
 
-exports.listAll = async (req, res) => {
+exports.listByUser = async (req, res) => {
     try {
-        const recipes = await Recipe.findAll();
+        const userId = req.user.userId; // Corrected to use 'userId'
+        console.log("Listing recipes for user ID:", userId); // Additional debugging line for listing by user
+        const recipes = await Recipe.findByUserId(userId);
         res.status(200).json(recipes);
     } catch (error) {
         console.error('Error retrieving recipes:', error);
@@ -42,25 +51,24 @@ exports.findById = async (req, res) => {
             res.status(404).json({ message: 'Recipe not found' });
         }
     } catch (error) {
-        console.error('Error retrieving recipe:', error.stack);
+        console.error('Error retrieving recipe:', error);
         res.status(500).json({ message: 'Error retrieving recipe', error: error.message });
     }
 };
 
 exports.update = async (req, res) => {
-    console.log("req.file:", req.file);
     const { id } = req.params;
     const { title, description, ingredients, instructions } = req.body;
-    let updateData = { title, description, ingredients, instructions };
-
-    if (req.file) {
-        const imagePath = req.file.path; 
-        updateData.imagePath = imagePath;
-    }
+    const imagePath = req.file ? req.file.path : null;
 
     try {
-        const recipeId = parseInt(id);
-        const updatedRecipe = await Recipe.update(recipeId, updateData);
+        const updatedRecipe = await Recipe.update(id, {
+            title,
+            description,
+            ingredients,
+            instructions,
+            imagePath
+        });
         if (updatedRecipe) {
             res.status(200).json({ message: 'Recipe updated successfully', recipe: updatedRecipe });
         } else {
@@ -72,7 +80,6 @@ exports.update = async (req, res) => {
     }
 };
 
-
 exports.delete = async (req, res) => {
     const { id } = req.params;
     try {
@@ -83,7 +90,7 @@ exports.delete = async (req, res) => {
             res.status(404).json({ message: 'Recipe not found' });
         }
     } catch (error) {
-        console.error('Error deleting recipe:', error.stack);
+        console.error('Error deleting recipe:', error);
         res.status(500).json({ message: 'Error deleting recipe', error: error.message });
     }
 };
