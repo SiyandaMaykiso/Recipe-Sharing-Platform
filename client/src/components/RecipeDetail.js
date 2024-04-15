@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'react-share';
+import { EmailShareButton, EmailIcon } from 'react-share';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -21,23 +23,15 @@ const RecipeDetail = () => {
     fetchData();
   }, [id]);
 
-  const copyLinkToClipboard = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url)
-      .then(() => {
-        alert('Recipe link copied to clipboard!');
-      })
-      .catch(err => {
-        console.error('Failed to copy: ', err);
-      });
-  };
+  const url = window.location.href;
+  const title = `Check out this recipe: ${recipe.title}`;
 
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="container recipe-detail-container" style={{ maxWidth: '800px', margin: 'auto' }}>
       <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">Back to Dashboard</button>
-      <button onClick={copyLinkToClipboard} className="btn btn-primary">Copy Recipe Link</button>
+      <button onClick={() => navigator.clipboard.writeText(url)} className="btn btn-primary">Copy Recipe Link</button>
       {recipe && (
         <>
           <h2>{recipe.title}</h2>
@@ -60,6 +54,18 @@ const RecipeDetail = () => {
               <li key={index} style={{ marginBottom: '10px', paddingLeft: '20px' }}>{step}</li>
             )) : <li>No instructions provided.</li>}
           </ol>
+          {/* Social Media Sharing Buttons */}
+          <div style={{ marginTop: '30px' }}>
+            <FacebookShareButton url={url} quote={title}>
+              <FacebookIcon size={32} round />
+            </FacebookShareButton>
+            <TwitterShareButton url={url} title={title}>
+              <TwitterIcon size={32} round />
+            </TwitterShareButton>
+            <EmailShareButton url={url} subject={title} body="Check out this recipe!">
+              <EmailIcon size={32} round />
+            </EmailShareButton>
+          </div>
         </>
       )}
     </div>
