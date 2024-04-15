@@ -187,15 +187,19 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="form-control">
-                    <label>Instructions</label>
-                        <textarea
-                            name="instructions"
-                            value={editFormData.instructions}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                            style={{ overflow: 'hidden', resize: 'none' }}
-                        />
-                    </div>
+  <label>Instructions</label>
+  <textarea
+    name="instructions"
+    value={editFormData.instructions}
+    onChange={handleEditFormChange}
+    className="ingredient-input"
+    style={{ overflow: 'hidden', resize: 'both' }}  // Updated this line
+    onInput={(e) => {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`;
+    }}
+  />
+</div>
                     <div className="form-control">
                     <label htmlFor="image">Recipe Image</label>
                     <input

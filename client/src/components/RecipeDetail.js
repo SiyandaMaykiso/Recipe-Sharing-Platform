@@ -47,17 +47,17 @@ const RecipeDetail = () => {
             style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '400px' }}
           />
           <h3>Description</h3>
-          <p style={{ marginBottom: '20px' }}>{recipe.description}</p> {/* Added margin to the bottom of the paragraph */}
+          <p style={{ marginBottom: '20px' }}>{recipe.description}</p>
           <h3>Ingredients</h3>
-          <ul>
+          <ul style={{ listStyleType: 'none', paddingLeft: '0', margin: '0' }}>
             {recipe.ingredients ? recipe.ingredients.split('\n').map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
+              <li key={index} style={{ marginBottom: '10px' }}>{ingredient}</li>
             )) : <li>No ingredients listed.</li>}
           </ul>
           <h3>Instructions</h3>
-          <ol>
+          <ol style={{ listStyleType: 'none', paddingLeft: '0', margin: '0' }}>
             {recipe.instructions ? recipe.instructions.split('\n').map((step, index) => (
-              <li key={index}>{step}</li>
+              <li key={index} style={{ marginBottom: '10px', paddingLeft: '20px' }}>{step}</li>
             )) : <li>No instructions provided.</li>}
           </ol>
         </>
