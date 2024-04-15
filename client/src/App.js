@@ -11,6 +11,8 @@ import Dashboard from './components/Dashboard'; // Make sure this line is added 
 import RecipeDetail from './components/RecipeDetail'; // Import your RecipeDetail component
 import RecipeListings from './components/RecipeListings'; // Import the component
 
+console.log("Starting the application...");
+
 function App() {
   const recipeFormInitialValues = {
     title: '',

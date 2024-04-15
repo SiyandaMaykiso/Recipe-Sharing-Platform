@@ -93,28 +93,30 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.id; // Using 'id' from token
+    const userId = req.user.userId;  // Use req.user.userId instead of req.user.id
     let updateFields = {};
 
     if (req.file) {
         updateFields.profile_image_path = req.file.path;
     }
 
-    if (Object.keys(updateFields).length > 0) {
-        try {
-            const updatedUser = await User.update(userId, updateFields);
-            if (!updatedUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
+    // Check if any fields are provided for the update
+    if (Object.keys(updateFields).length === 0) {
+        return res.status(400).json({ message: "No valid fields provided for update" });
+    }
 
-            res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
-        } catch (error) {
-            res.status(500).json({ message: 'Error updating profile', error: error.message });
+    try {
+        const updatedUser = await User.update(userId, updateFields);
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
         }
-    } else {
-        res.status(400).json({ message: 'No update fields provided' });
+        res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Error updating profile', error: error.message });
     }
 };
+
 
 exports.deleteAccount = async (req, res) => {
     try {

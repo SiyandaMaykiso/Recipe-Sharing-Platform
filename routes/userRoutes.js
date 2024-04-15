@@ -11,7 +11,9 @@ router.post('/login', userController.login);
 
 router.get('/user/profile', authenticate, userController.getProfile);
 
+console.log("Setting up user routes...");
 router.put('/user/profile', authenticate, upload.single('profileImage'), userController.updateProfile);
+console.log("User profile update route configured.");
 
 router.delete('/user/delete', authenticate, userController.deleteAccount);
 
