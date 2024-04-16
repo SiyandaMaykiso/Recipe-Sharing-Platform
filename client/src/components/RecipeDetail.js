@@ -42,18 +42,18 @@ const RecipeDetail = () => {
             alt={recipe.title}
             style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '400px' }}
           />
-          <h3>Description</h3>
-          <p style={{ marginBottom: '20px' }}>{recipe.description}</p>
+     <h3>Description</h3>
+          <p style={{ marginTop: '10px', marginBottom: '20px' }}>{recipe.description}</p>
           <h3>Ingredients</h3>
-          <ul style={{ listStyleType: 'none', paddingLeft: '0', margin: '0' }}>
+          <ul style={{ marginTop: '20px', listStyleType: 'none', paddingLeft: '0', marginBottom: '20px' }}>
             {recipe.ingredients ? recipe.ingredients.split('\n').map((ingredient, index) => (
               <li key={index} style={{ marginBottom: '10px' }}>{ingredient}</li>
             )) : <li>No ingredients listed.</li>}
           </ul>
           <h3>Instructions</h3>
-          <ol style={{ listStyleType: 'none', paddingLeft: '0', margin: '0' }}>
+          <ol style={{ marginTop: '20px', listStyleType: 'none', paddingLeft: '20px', marginBottom: '20px' }}>
             {recipe.instructions ? recipe.instructions.split('\n').map((step, index) => (
-              <li key={index} style={{ marginBottom: '10px', paddingLeft: '20px' }}>{step}</li>
+              <li key={index} style={{ marginBottom: '10px' }}>{step}</li>
             )) : <li>No instructions provided.</li>}
           </ol>
           {/* Social Media Sharing Buttons */}
