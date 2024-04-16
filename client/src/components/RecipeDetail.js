@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'react-share';
-import { EmailShareButton, EmailIcon } from 'react-share';
+import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon, EmailShareButton, EmailIcon } from 'react-share';
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -30,13 +29,16 @@ const RecipeDetail = () => {
 
   return (
     <div className="container recipe-detail-container" style={{ maxWidth: '800px', margin: 'auto' }}>
-      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">Back to Dashboard</button>
-      <button onClick={() => navigator.clipboard.writeText(url)} className="btn btn-primary">Copy Recipe Link</button>
+      <div className="navigation-buttons">
+        <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">Back to Dashboard</button>
+        <button onClick={() => navigate('/recipes')} className="btn btn-secondary">Back to Recipes</button>
+        <button onClick={() => navigator.clipboard.writeText(url)} className="btn btn-primary">Copy Recipe Link</button>
+      </div>
       {recipe && (
         <>
           <h2>{recipe.title}</h2>
           <img
-            src={recipe.image_path ? `http://localhost:3000/${recipe.image_path}` : '/default-recipe-image.jpg'}
+            src={recipe.image_path ? recipe.image_path : '/default-recipe-image.jpg'}
             alt={recipe.title}
             style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '400px' }}
           />

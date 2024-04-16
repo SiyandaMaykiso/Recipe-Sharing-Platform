@@ -1,18 +1,18 @@
 const Recipe = require('../models/recipe');
 
 exports.create = async (req, res) => {
-    console.log("Received JWT decoded data:", req.user); // This will log the decoded JWT data
+    console.log("Received JWT decoded data:", req.user); // Log the decoded JWT data
+    const { title, description, ingredients, instructions } = req.body;
+    const userId = req.user.id; // Standardize to use 'id'
+    console.log("User ID from JWT:", userId); // Log the user ID to verify it's passed correctly
+
+    if (!userId) {
+        console.error("User ID is missing");
+        return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const imagePath = req.file ? req.file.path : undefined; // Handle cases where no image is uploaded
     try {
-        const { title, description, ingredients, instructions } = req.body;
-        const userId = req.user.userId; // Corrected to use 'userId'
-        console.log("User ID from JWT:", userId); // Log the user ID to verify it's passed correctly
-
-        if (!userId) {
-            console.error("User ID is missing");
-            return res.status(400).json({ message: "User ID is required" });
-        }
-
-        const imagePath = req.file ? req.file.path : '';
         const recipe = await Recipe.create({
             userId,
             title,

@@ -72,8 +72,18 @@ exports.authenticate = (req, res, next) => {
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(403).json({ message: 'Token is not valid' });
-        req.user = decoded; // Ensuring that decoded token information is attached to the request object
+        if (err) {
+            return res.status(403).json({ message: 'Token is not valid', error: err.message });
+        }
+        
+        console.log("Decoded JWT:", decoded); // Log to see the actual decoded token
+
+        if (!decoded || !decoded.id) {
+            console.log('Decoded token is missing ID:', decoded);
+            return res.status(401).json({ message: 'User ID is missing' });
+        }
+
+        req.user = decoded;
         next();
     });
 };
@@ -93,7 +103,7 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.userId;  // Use req.user.userId instead of req.user.id
+    const userId = req.user.id;  // Corrected to use 'id'
     let updateFields = {};
 
     if (req.file) {

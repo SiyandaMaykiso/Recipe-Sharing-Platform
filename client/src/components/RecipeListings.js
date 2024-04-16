@@ -7,7 +7,7 @@ const RecipeListings = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    const token = user ? user.token : null; // Ensure this matches the Dashboard's method
+    const token = user ? user.token : null;
 
     if (!token) {
       navigate('/login');
@@ -41,7 +41,7 @@ const RecipeListings = () => {
         {recipes.map((recipe) => (
           <div key={recipe.recipe_id} className="recipe-card" style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
             <img
-              src={recipe.image_path ? `http://localhost:3000/${recipe.image_path}` : '/default-recipe-image.jpg'}
+              src={recipe.image_path ? recipe.image_path : '/default-recipe-image.jpg'}
               alt={recipe.title}
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
             />

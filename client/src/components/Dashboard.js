@@ -59,12 +59,14 @@ const Dashboard = () => {
     const handleEditFormChange = (event) => {
         const { name, value } = event.target;
         if (name === "recipeImage") {
-            
             handleImageChange(event);
         } else {
-           
-            setEditFormData(prev => ({ ...prev, [name]: value }));
-            if(event.target.tagName.toLowerCase() === 'textarea') {
+            // Only update the field if something is entered, otherwise keep the old value.
+            setEditFormData(prev => ({
+                ...prev,
+                [name]: value !== '' ? value : prev[name]
+            }));
+            if (event.target.tagName.toLowerCase() === 'textarea') {
                 autoExpandTextArea(event.target);
             }
         }
@@ -83,7 +85,9 @@ const Dashboard = () => {
         element.style.height = `${element.scrollHeight}px`; 
     };
 
-    const saveEdit = async () => {
+    const saveEdit = async (event) => {
+        event.preventDefault();  // Prevent default form submission behavior
+    
         const formData = new FormData();
         formData.append('title', editFormData.title);
         formData.append('description', editFormData.description);
@@ -108,13 +112,11 @@ const Dashboard = () => {
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error("Error updating recipe:", errorResponse);
-                
                 setSuccessMessage(errorResponse.message || 'Failed to update the recipe. Please try again.');
                 setTimeout(() => setSuccessMessage(''), 5000);
-                return; 
+                return;
             }
     
-            
             fetchRecipes(token);
             setIsEditing(false);
             setSuccessMessage('Recipe updated successfully!');
