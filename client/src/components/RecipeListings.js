@@ -34,7 +34,7 @@ const RecipeListings = () => {
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <h1>Recipes</h1>
-      <button onClick={() => navigate('/dashboard')} style={{ marginBottom: '20px' }}>
+      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary" style={{ marginBottom: '20px' }}>
         Back to Dashboard
       </button>
       <div className="recipes-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
@@ -45,9 +45,10 @@ const RecipeListings = () => {
               alt={recipe.title}
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
             />
-            <h3>
-              <Link to={`/recipes/${recipe.recipe_id}`}>{recipe.title}</Link>
-            </h3>
+            <h3>{recipe.title}</h3> {/* Display recipe title */}
+            <Link to={`/recipes/${recipe.recipe_id}`} className="btn">
+              View Recipe
+            </Link>
             <p>{recipe.description.length > 100 ? `${recipe.description.substring(0, 100)}...` : recipe.description}</p>
           </div>
         ))}
