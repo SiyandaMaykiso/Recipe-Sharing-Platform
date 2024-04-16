@@ -2,15 +2,17 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const { authenticate } = require('../middleware/auth');
-const { parser } = require('../middleware/cloudinaryConfig'); // ensure this is correct
+// Change the import to use the specific profile parser
+const { profileParser } = require('../middleware/cloudinaryConfig'); // Importing the specific profileParser
+
+console.log("Setting up user routes...");
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/user/profile', authenticate, userController.getProfile);
 
-// Make sure you are logging for debugging purposes
-console.log("Setting up user routes...");
-router.put('/user/profile', authenticate, parser.single('profileImage'), userController.updateProfile);
+// Use profileParser for the profile update route
+router.put('/user/profile', authenticate, profileParser.single('profileImage'), userController.updateProfile);
 console.log("User profile update route configured.");
 
 router.delete('/user/delete', authenticate, userController.deleteAccount);

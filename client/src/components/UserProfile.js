@@ -13,7 +13,8 @@ const UserProfile = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.token) {
       setNewEmail(user.email);
-      const imageUrl = user.profile_image_path ? `http://localhost:3000/${user.profile_image_path}` : '/path/to/default/profileImage';
+      // Use Cloudinary URL directly if available, or set a default image path
+      const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
       setProfileImageUrl(imageUrl);
     } else {
       navigate('/');
@@ -39,11 +40,10 @@ const UserProfile = () => {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/user/profile', { // Check this URL
+        const response = await fetch('http://localhost:3000/user/profile', {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                // Do not set 'Content-Type': 'multipart/form-data' here as it needs to be set automatically
             },
             body: formData,
         });
@@ -55,7 +55,7 @@ const UserProfile = () => {
         const updatedUserResponse = await response.json();
         const updatedUser = { ...updatedUserResponse.user, token: user.token };
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
+        setProfileImageUrl(updatedUser.profile_image_path);  // Use the direct Cloudinary URL
         alert('Profile updated successfully!');
     } catch (error) {
         console.error('Failed to update profile', error);

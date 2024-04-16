@@ -9,20 +9,32 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Set up Cloudinary storage for multer
-const storage = new CloudinaryStorage({
+// Set up Cloudinary storage for recipe images
+const recipeStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'RecipeImages', // The name of the folder in Cloudinary
-        allowedFormats: ['jpg', 'png'], // Supported file types
-        public_id: (req, file) => new Date().toISOString() + '_' + file.originalname // Use date and original filename as public id
+        folder: 'RecipeImages',
+        allowedFormats: ['jpg', 'png'],
+        public_id: (req, file) => 'recipe_' + new Date().toISOString() + '_' + file.originalname
     },
 });
 
-const parser = multer({ storage });
+// Set up Cloudinary storage for profile images
+const profileStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'ProfileImages',
+        allowedFormats: ['jpg', 'png'],
+        public_id: (req, file) => 'profile_' + req.user.id // or some other unique identifier
+    },
+});
 
-// Export the configured parser to be used in your routes
+const recipeParser = multer({ storage: recipeStorage });
+const profileParser = multer({ storage: profileStorage });
+
+// Export the configured parsers to be used in your routes
 module.exports = {
     cloudinary,
-    parser
+    recipeParser,
+    profileParser
 };
