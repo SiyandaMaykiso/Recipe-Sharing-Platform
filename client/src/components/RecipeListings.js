@@ -6,25 +6,30 @@ const RecipeListings = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const token = localStorage.getItem('token'); // Ensure this matches how you store your token in local storage
-        const response = await fetch('http://localhost:3000/recipes', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!response.ok) throw new Error('Failed to fetch recipes');
-        const data = await response.json();
-        console.log('Fetched Recipes:', data);
-        setRecipes(data);
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      }
-    };
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user ? user.token : null; // Ensure this matches the Dashboard's method
 
-    fetchRecipes();
-  }, []);
+    if (!token) {
+      navigate('/login');
+    } else {
+      const fetchRecipes = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/recipes', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (!response.ok) throw new Error('Failed to fetch recipes');
+          const data = await response.json();
+          setRecipes(data);
+        } catch (error) {
+          console.error("Error fetching recipes:", error);
+        }
+      };
+
+      fetchRecipes();
+    }
+  }, [navigate]);
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>

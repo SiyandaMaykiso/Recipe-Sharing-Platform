@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
 
 exports.listByUser = async (req, res) => {
     try {
-        const userId = req.user.userId; // Corrected to use 'userId'
+        const userId = req.user.id;  // Using 'id' directly from req.user
         console.log("Listing recipes for user ID:", userId); // Additional debugging line for listing by user
         const recipes = await Recipe.findByUserId(userId);
         res.status(200).json(recipes);
@@ -40,6 +40,7 @@ exports.listByUser = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving recipes', error: error.message });
     }
 };
+
 
 exports.findById = async (req, res) => {
     const { id } = req.params;
