@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Correct relative path from components to contexts
+import { useAuth } from '../contexts/AuthContext';  // Assuming correct relative path from components to contexts
 
 function Registration() {
   const [username, setUsername] = useState('');
@@ -46,23 +46,44 @@ function Registration() {
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <h2>Registration Form</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+        <div style={{ marginBottom: '10px' }}>
           <label htmlFor="username">Username:</label>
-          <input type="text" id="username" required value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input
+            type="text"
+            id="username"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{ width: '100%', padding: '8px', margin: '4px 0' }}
+          />
         </div>
-        <div>
+        <div style={{ marginBottom: '10px' }}>
           <label htmlFor="email">Email:</label>
-          <input type="email" id="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            id="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '100%', padding: '8px', margin: '4px 0' }}
+          />
         </div>
-        <div>
+        <div style={{ marginBottom: '10px' }}>
           <label htmlFor="password">Password:</label>
-          <input type="password" id="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input
+            type="password"
+            id="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '8px', margin: '4px 0' }}
+          />
         </div>
-        <button type="submit">Register</button>
-        {registrationError && <div style={{ color: 'red' }}>{registrationError}</div>}
+        <button type="submit" style={{ padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px' }}>Register</button>
+        {registrationError && <div style={{ color: 'red', marginTop: '10px' }}>{registrationError}</div>}
       </form>
     </div>
   );

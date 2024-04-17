@@ -9,40 +9,39 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-        const response = await fetch('http://localhost:3000/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-  
-        if (!response.ok) {
-            throw new Error(response.statusText || 'Login failed');
-        }
-  
-        const data = await response.json();
-  
-        if (data.token && data.user && data.user.user_id) {
-            
-            localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));console.log('Login Token:', data.token); // Log the token to compare later
-navigate('/dashboard');
-        } else {
-            throw new Error('Login response missing user ID or token');
-        }
+      const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+          throw new Error(response.statusText || 'Login failed');
+      }
+
+      const data = await response.json();
+
+      if (data.token && data.user && data.user.user_id) {
+          localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));
+          navigate('/dashboard');
+      } else {
+          throw new Error('Login response missing user ID or token');
+      }
     } catch (error) {
-        console.error('Login error:', error);
-        setLoginError('Failed to login. Please check your credentials.');
+      console.error('Login error:', error);
+      setLoginError('Failed to login. Please check your credentials.');
     }
-};
+  };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <h2>Login Form</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+        <div style={{ marginBottom: '10px' }}>
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -50,9 +49,10 @@ navigate('/dashboard');
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '100%', padding: '8px', margin: '4px 0' }}
           />
         </div>
-        <div>
+        <div style={{ marginBottom: '10px' }}>
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -60,10 +60,11 @@ navigate('/dashboard');
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            style={{ width: '100%', padding: '8px', margin: '4px 0' }}
           />
         </div>
-        <button type="submit">Login</button>
-        {loginError && <div style={{ color: 'red' }}>{loginError}</div>}
+        <button type="submit" style={{ padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '5px' }}>Login</button>
+        {loginError && <div style={{ color: 'red', marginTop: '10px' }}>{loginError}</div>}
       </form>
     </div>
   );
