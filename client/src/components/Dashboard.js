@@ -26,6 +26,11 @@ const Dashboard = () => {
         }
     }, [navigate]);
 
+    useEffect(() => {
+        // Apply auto-expansion to all textareas when recipes are fetched or editing starts
+        document.querySelectorAll('textarea').forEach(autoExpandTextArea);
+    }, [recipes, isEditing]);  // Dependencies ensure this runs when recipes or edit mode changes
+
     const fetchRecipes = async (token) => {
         try {
             const response = await fetch('http://localhost:3000/recipes', {
@@ -166,19 +171,19 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="form-control">
-                        <label>Description</label>
-                        <textarea
-                            name="description"
-                            value={editFormData.description}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                            style={{ overflow: 'hidden' }}
-                            onInput={(e) => {
-                                e.target.style.height = 'inherit';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                            }}
-                        />
-                    </div>
+    <label>Description</label>
+    <textarea
+        name="description"
+        value={editFormData.description}
+        onChange={handleEditFormChange}
+        className="ingredient-input"
+        style={{ overflow: 'hidden', resize: 'none' }}  // Ensure the textarea does not manually resize
+        onInput={(e) => {
+            e.target.style.height = 'inherit';
+            e.target.style.height = `${e.target.scrollHeight}px`;
+        }}
+    />
+</div>
                     <div className="form-control">
                         <label>Ingredients</label>
                         <textarea
