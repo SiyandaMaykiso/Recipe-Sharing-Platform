@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 const generateAccessToken = (id, email) => {
     return jwt.sign(
-        { id, email },  // Standardized payload to use 'id'
+        { id, email }, 
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
     );
@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create(username, email, hashedPassword);
-        const token = generateAccessToken(newUser.user_id, newUser.email); // Consistently using the same JWT payload structure
+        const token = generateAccessToken(newUser.user_id, newUser.email);
 
         res.status(201).json({
             message: 'User created successfully',
@@ -49,9 +49,9 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Incorrect password' });
         }
 
-        const token = generateAccessToken(user.user_id, user.email);  // Use the revised function here
+        const token = generateAccessToken(user.user_id, user.email); 
 
-        const { password: _, ...userInfo } = user;  // Properly omit the password from the response
+        const { password: _, ...userInfo } = user; 
 
         res.status(200).json({
             message: 'Login successful',
@@ -76,7 +76,7 @@ exports.authenticate = (req, res, next) => {
             return res.status(403).json({ message: 'Token is not valid', error: err.message });
         }
         
-        console.log("Decoded JWT:", decoded); // Log to see the actual decoded token
+        console.log("Decoded JWT:", decoded);
 
         if (!decoded || !decoded.id) {
             console.log('Decoded token is missing ID:', decoded);
@@ -90,7 +90,7 @@ exports.authenticate = (req, res, next) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id); // Adjusted to use 'id' from the standardized token payload
+        const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -103,14 +103,14 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    const userId = req.user.id;  // Corrected to use 'id'
+    const userId = req.user.id;
     let updateFields = {};
 
     if (req.file) {
         updateFields.profile_image_path = req.file.path;
     }
 
-    // Check if any fields are provided for the update
+    
     if (Object.keys(updateFields).length === 0) {
         return res.status(400).json({ message: "No valid fields provided for update" });
     }
@@ -130,7 +130,7 @@ exports.updateProfile = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
     try {
-        await User.delete(req.user.id); // Using 'id' from token
+        await User.delete(req.user.id);
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting account', error: error.message });
@@ -146,7 +146,7 @@ exports.refreshToken = async (req, res) => {
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        const accessToken = generateAccessToken(decoded.id, decoded.email); // Corrected to use 'id'
+        const accessToken = generateAccessToken(decoded.id, decoded.email);
 
         res.json({ accessToken });
     } catch (error) {

@@ -1,15 +1,15 @@
-/* Resets some basic elements for a more consistent look */
+
 body, h1, h2, h3, p, form, input, button {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Sets a font and some basic background colors */
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #FFF3E4; ; /* Soft peach background */
-  color: #5A4A42; /* Dark brown text for soft contrast */
+  background-color: #FFF3E4; ;
+  color: #5A4A42;
   line-height: 1.6;
   padding: 20px;
 }
@@ -19,7 +19,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Adjust height as needed */
+  min-height: 100vh;
 }
 
 
@@ -31,7 +31,7 @@ body {
 }
 
 .header {
-  background-color: #FFAD60; /* Warm orange for the header */
+  background-color: #FFAD60;
   color: #FFF;
   padding: 1rem;
   text-align: center;
@@ -40,7 +40,7 @@ body {
 .ingredient-list {
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Space between each ingredient field */
+  gap: 10px; 
 }
 
 .ingredient-field {
@@ -51,14 +51,14 @@ body {
 
 .ingredient-input {
   padding: 10px;
-  font-size: 16px; /* Larger font size for readability */
-  width: 100%; /* Full width within its container */
+  font-size: 16px;
+  width: 100%;
   margin-bottom: 5px;
 }
 
 .ingredient-actions {
   display: flex;
-  gap: 5px; /* Space between action buttons */
+  gap: 5px;
 }
 
 .main-header {
@@ -91,7 +91,7 @@ body {
 
 .btn {
   display: inline-block;
-  background: #E95536; /* Vibrant orange for buttons */
+  background: #E95536;
   color: white;
   padding: 10px 20px;
   margin: 10px 0;
@@ -105,7 +105,7 @@ body {
 }
 
 .btn-secondary {
-  background: #F9A875; /* Secondary button with a softer orange */
+  background: #F9A875;
 }
 
 .form-control {
@@ -119,23 +119,23 @@ body {
 }
 
 .form-control input, .form-control textarea {
-  padding: 15px; /* Increase padding for larger input fields */
+  padding: 15px;
   border-radius: 5px;
   border: 1px solid #ddd;
-  font-size: 18px; /* Increase font size for better readability */
+  font-size: 18px;
 }
 
-/* Adjusting input and textarea width */
+
 .form-control input, .form-control textarea {
   width: 110%;
 }
 
-/* Link styling adjustments */
+
 .App-link:hover {
   color: #ffffff;
 }
 
-/* Simple grid for recipes */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -161,7 +161,7 @@ body {
 .recipe-title {
   margin-bottom: 10px;
   font-size: 20px;
-  color: #5A4A42; /* Use primary color for titles */
+  color: #5A4A42;
 }
 
 .recipe-listings .recipes-grid {
@@ -195,11 +195,11 @@ body {
 .dashboard {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers children horizontally in the container */
-  justify-content: center; /* Centers children vertically in the container */
+  align-items: center;
+  justify-content: center;
 }
 
-/* Text Alignment */
+
 .dashboard {
   text-align: center;
 }
@@ -209,52 +209,52 @@ body {
 }
 
 .dashboard h1 {
-  font-size: 24px; /* Example size */
+  font-size: 24px;
   font-weight: bold;
 }
 
 .dashboard li {
-  text-align: left; /* or "justify" for justified text */
-  margin-bottom: 10px; /* Adds space between list items */
-  padding: 5px; /* Adds space inside each list item */
+  text-align: left;
+  margin-bottom: 10px;
+  padding: 5px;
 }
 
 .dashboard,
 .recipe-form-container {
-  max-width: 1100px; /* Increase the max-width for a wider area */
-  width: 95%; /* You can adjust the width percentage as needed */
-  margin: auto; /* Center the container */
-  padding: 20px; /* Adjust padding as needed */
-  background-color: #fff; /* Background color */
-  border-radius: 8px; /* Add border-radius for rounded corners */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add box shadow for depth */
+  max-width: 1100px;
+  width: 95%;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .dashboard p {
-  font-size: 16px; /* Example size */
+  font-size: 16px;
   font-weight: normal;
 }
 
-/* Target the list items directly to style the content within */
+
 .dashboard ul li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0; /* Add some vertical padding for spacing */
+  padding: 10px 0;
 }
 
-/* Specific styles for the title and buttons container to ensure they are spaced out */
+
 .dashboard ul li > div:first-child,
 .dashboard ul li > div:last-child {
   flex: 1;
 }
 
-/* Ensuring the buttons have some spacing between them */
+
 .dashboard ul li button {
-  margin-left: 10px; /* Add space to the left of buttons */
+  margin-left: 10px;
 }
 
-/* New styles for centering forms */
+
 .home-container, .forms-wrapper {
   display: flex;
   flex-direction: column;
@@ -264,17 +264,17 @@ body {
 }
 
 .form-container {
-  width: 95%; /* Adjust width as needed */
-  max-width: 800px; /* Increase max-width for a larger form */
-  margin: 40px auto; /* Increase margin for more space, centers the form */
-  padding: 40px; /* Increase padding for more internal space */
+  width: 95%;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  font-size: 18px; /* Adjust font size as needed for readability */
+  font-size: 18px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centers the content inside the form-container */
+  align-items: center;
 }
 
 @media screen and (min-width: 768px) {
@@ -291,10 +291,10 @@ body {
 
 @media (max-width: 768px) {
   .recipe-form-container {
-    width: 100%; /* Full width on smaller screens */
+    width: 100%;
     margin: 10px auto;
     padding: 20px;
-    max-width: 90%; /* Allows more space for the form on smaller screens */
+    max-width: 90%;
   }
 }
 
@@ -306,21 +306,21 @@ body {
   }
 }
 
-/* Add space after the submit button */
+
 .recipe-form-container button[type="submit"] {
-  margin-bottom: 20px; /* Adjust the space as needed */
+  margin-bottom: 20px; 
 }
 
-/* Alternatively, if the "Back to Dashboard" is a link styled as a button, you can target it directly if it has a specific class, or generically like this: */
+
 .recipe-form-container a.button-link {
-  display: block; /* Makes it take the full width, ensuring it starts on a new line */
-  margin-top: 20px; /* Adds space above it */
+  display: block; 
+  margin-top: 20px;
 }
 
 .resizable-textarea {
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
 }
 
 .resizable-textarea {
-  resize: horizontal; /* Allow horizantle resizing */
+  resize: horizontal;
 }

@@ -32,13 +32,13 @@ app.get('/', (req, res) => {
   res.send('Recipe Sharing Platform API is running...');
 });
 
-// Catch-all for 404 errors
+
 app.use((req, res, next) => {
   console.log("Handling 404 error.");
   res.status(404).send('Sorry, that route does not exist.');
 });
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
   console.error("An error occurred:", err.stack);
   res.status(500).send('Something broke!');

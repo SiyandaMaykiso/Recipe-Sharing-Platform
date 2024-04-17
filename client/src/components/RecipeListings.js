@@ -45,7 +45,7 @@ const RecipeListings = () => {
               alt={recipe.title}
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
             />
-            <h3>{recipe.title}</h3> {/* Display recipe title */}
+            <h3>{recipe.title}</h3>
             <Link to={`/recipes/${recipe.recipe_id}`} className="btn">
               View Recipe
             </Link>

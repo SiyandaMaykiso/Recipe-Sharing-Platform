@@ -56,7 +56,7 @@ const RecipeDetail = () => {
               <li key={index} style={{ marginBottom: '10px' }}>{step}</li>
             )) : <li>No instructions provided.</li>}
           </ol>
-          {/* Social Media Sharing Buttons */}
+      
           <div style={{ marginTop: '30px' }}>
             <FacebookShareButton url={url} quote={title}>
               <FacebookIcon size={32} round />

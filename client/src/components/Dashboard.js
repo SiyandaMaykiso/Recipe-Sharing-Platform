@@ -27,9 +27,9 @@ const Dashboard = () => {
     }, [navigate]);
 
     useEffect(() => {
-        // Apply auto-expansion to all textareas when recipes are fetched or editing starts
+        
         document.querySelectorAll('textarea').forEach(autoExpandTextArea);
-    }, [recipes, isEditing]);  // Dependencies ensure this runs when recipes or edit mode changes
+    }, [recipes, isEditing]);  
 
     const fetchRecipes = async (token) => {
         try {
@@ -66,7 +66,7 @@ const Dashboard = () => {
         if (name === "recipeImage") {
             handleImageChange(event);
         } else {
-            // Only update the field if something is entered, otherwise keep the old value.
+            
             setEditFormData(prev => ({
                 ...prev,
                 [name]: value !== '' ? value : prev[name]
@@ -91,7 +91,7 @@ const Dashboard = () => {
     };
 
     const saveEdit = async (event) => {
-        event.preventDefault();  // Prevent default form submission behavior
+        event.preventDefault();  
     
         const formData = new FormData();
         formData.append('title', editFormData.title);
@@ -177,7 +177,7 @@ const Dashboard = () => {
         value={editFormData.description}
         onChange={handleEditFormChange}
         className="ingredient-input"
-        style={{ overflow: 'hidden', resize: 'none' }}  // Ensure the textarea does not manually resize
+        style={{ overflow: 'hidden', resize: 'none' }} 
         onInput={(e) => {
             e.target.style.height = 'inherit';
             e.target.style.height = `${e.target.scrollHeight}px`;
@@ -200,7 +200,7 @@ const Dashboard = () => {
     value={editFormData.instructions}
     onChange={handleEditFormChange}
     className="ingredient-input"
-    style={{ overflow: 'hidden', resize: 'both' }}  // Updated this line
+    style={{ overflow: 'hidden', resize: 'both' }}
     onInput={(e) => {
         e.target.style.height = 'inherit';
         e.target.style.height = `${e.target.scrollHeight}px`;

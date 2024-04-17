@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     getAuthHeader,
     updateProfile,
-    setUserAndToken,  // Make sure to expose this new method
+    setUserAndToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

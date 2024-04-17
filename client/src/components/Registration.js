@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Assuming correct relative path from components to contexts
+import { useAuth } from '../contexts/AuthContext';
 
 function Registration() {
   const [username, setUsername] = useState('');
@@ -9,7 +9,7 @@ function Registration() {
   const [registrationError, setRegistrationError] = useState('');
 
   const navigate = useNavigate();
-  const { setUserAndToken } = useAuth();  // Destructure setUserAndToken from the context
+  const { setUserAndToken } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,10 +31,10 @@ function Registration() {
       const data = await response.json();
       console.log('Registration successful:', data);
 
-      // Set user and token in auth context and local storage
+      
       if (data.user && data.token) {
-        setUserAndToken(data.user, data.token);  // Update AuthContext state
-        navigate('/dashboard');  // Navigate to dashboard after setting the user and token
+        setUserAndToken(data.user, data.token); 
+        navigate('/dashboard'); 
       } else {
         console.error('User details or token not provided in registration response');
         setRegistrationError('Failed to complete registration.');

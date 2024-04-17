@@ -30,7 +30,7 @@ function Login() {
             user_id: data.user.user_id,
             token: data.token,
             email: data.user.email,
-            profile_image_path: data.user.profile_image_path // Ensure this is provided correctly by your backend
+            profile_image_path: data.user.profile_image_path
           }));
           navigate('/dashboard');
       } else {
