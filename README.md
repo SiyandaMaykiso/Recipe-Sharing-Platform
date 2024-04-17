@@ -5,31 +5,42 @@ The Recipe Sharing Platform is a web application that allows users to share thei
 
 ## Features
 
-User Authentication: Secure login and registration functionality for users.
-Recipe Management: Users can post, edit, and delete their recipes.
-Interactive Features: Users can rate recipes and leave comments.
-Responsive Design: Optimized for various devices and screen sizes.
-Image Upload: Integration with Cloudinary for efficient image handling.
+* User Authentication: Secure login and registration functionality for users.
+* Recipe Management: Users can post, edit, and delete their recipes.
+* Interactive Features: Users can rate recipes and leave comments.
+* Responsive Design: Optimized for various devices and screen sizes.
+* Image Upload: Integration with Cloudinary for efficient image handling.
 
 
 ## Technologies Used
 
-Frontend:
-React: For building the dynamic UI.
-React Router: For navigation within the application.
-Backend:
-Node.js: The runtime environment for running JavaScript on the server.
-Express: Framework used to build the web application.
-PostgreSQL: Database system for storing all user and recipe data.
-Authentication:
-JWT (JSON Web Tokens): For secure user authentication.
-Security:
-Bcrypt: For hashing and securing user passwords.
-Image Handling:
-Multer: Middleware for handling image uploads.
-Cloudinary: Cloud service for storing and serving images.
-Deployment:
-Heroku: Platform as a service (PaaS) for deploying the application.
+### Frontend:
+
+* React: For building the dynamic UI.
+* React Router: For navigation within the application.
+
+### Backend:
+
+* Node.js: The runtime environment for running JavaScript on the server.
+* Express: Framework used to build the web application.
+* PostgreSQL: Database system for storing all user and recipe data.
+
+### Authentication:
+
+* JWT (JSON Web Tokens): For secure user authentication.
+
+### Security:
+
+* Bcrypt: For hashing and securing user passwords.
+
+### Image Handling:
+
+* Multer: Middleware for handling image uploads.
+* Cloudinary: Cloud service for storing and serving images.
+
+### Deployment:
+
+* Heroku: Platform as a service (PaaS) for deploying the application.
 
 
 
