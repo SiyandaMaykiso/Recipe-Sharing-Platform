@@ -12,14 +12,13 @@ const UserProfile = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.token) {
-        setNewEmail(user.email);
-        const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
-        setProfileImageUrl(imageUrl);
+      setNewEmail(user.email);
+      const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
+      setProfileImageUrl(imageUrl);
     } else {
-        navigate('/');
+      navigate('/');
     }
-}, [navigate]);
-
+  }, [navigate]);
 
   const handleFileChange = (event) => {
     setProfileImage(event.target.files[0]);
@@ -36,56 +35,57 @@ const UserProfile = () => {
     const formData = new FormData();
     formData.append('email', newEmail);
     if (profileImage) {
-        formData.append('profileImage', profileImage);
+      formData.append('profileImage', profileImage);
     }
 
     try {
-        const response = await fetch('http://localhost:3000/user/profile', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-        });
+      const response = await fetch('http://localhost:3000/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
-        if (!response.ok) {
-            throw new Error('Failed to update profile');
-        }
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
 
-        const updatedUserResponse = await response.json();
-        const updatedUser = { ...updatedUserResponse.user, token: user.token };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
-        alert('Profile updated successfully!');
+      const updatedUserResponse = await response.json();
+      const updatedUser = { ...updatedUserResponse.user, token: user.token };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
+      alert('Profile updated successfully!');
     } catch (error) {
-        console.error('Failed to update profile', error);
-        setError('Failed to update profile. Please try again.');
+      console.error('Failed to update profile', error);
+      setError('Failed to update profile. Please try again.');
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   return (
-    <div className="user-profile-container centered-content">
-      <h1>User Profile</h1>
+    <div className="user-profile-container centered-content" style={{ maxWidth: '600px', margin: 'auto', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '10px', backgroundColor: '#fff' }}>
+      <h1 style={{ textAlign: 'center' }}>User Profile</h1>
       {profileImageUrl && (
-        <img src={profileImageUrl} alt="Profile" style={{ width: '200px', height: 'auto' }} className="profile-image" />
+        <img src={profileImageUrl} alt="Profile" style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '300px', margin: '20px auto', display: 'block' }} className="profile-image" />
       )}
-      <p>Email: {newEmail}</p>
-      <form onSubmit={handleSubmit} className="form-container">
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
         <div className="form-control">
-          <label>Update Email:</label>
-          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} />
+          <label>Email:</label>
+          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} style={{ padding: '10px', margin: '10px 0', border: '1px solid #ccc', borderRadius: '5px' }} />
         </div>
         <div className="form-control">
           <label>Profile Image:</label>
-          <input type="file" onChange={handleFileChange} disabled={loading} />
+          <input type="file" onChange={handleFileChange} disabled={loading} style={{ padding: '10px', margin: '10px 0' }} />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={loading}>Update Profile</button>
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '10px 20px', borderRadius: '5px', border: 'none', backgroundColor: '#4CAF50', color: 'white' }}>Update Profile</button>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={() => { localStorage.removeItem('user'); navigate('/'); }} className="btn btn-secondary" disabled={loading}>Logout</button>
-      <Link to="/dashboard" className="btn">Back to Dashboard</Link>
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button onClick={() => { localStorage.removeItem('user'); navigate('/'); }} className="btn btn-secondary" disabled={loading} style={{ marginRight: '10px' }}>Logout</button>
+        <Link to="/dashboard" className="btn" style={{ backgroundColor: '#f0f0f0', color: '#333', textDecoration: 'none', padding: '10px 20px', borderRadius: '5px' }}>Back to Dashboard</Link>
+      </div>
     </div>
   );
 };
