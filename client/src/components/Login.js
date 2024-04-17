@@ -26,7 +26,12 @@ function Login() {
       const data = await response.json();
 
       if (data.token && data.user && data.user.user_id) {
-          localStorage.setItem('user', JSON.stringify({ user_id: data.user.user_id, token: data.token }));
+          localStorage.setItem('user', JSON.stringify({
+            user_id: data.user.user_id,
+            token: data.token,
+            email: data.user.email,
+            profile_image_path: data.user.profile_image_path // Ensure this is provided correctly by your backend
+          }));
           navigate('/dashboard');
       } else {
           throw new Error('Login response missing user ID or token');

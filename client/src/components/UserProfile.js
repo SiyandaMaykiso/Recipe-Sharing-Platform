@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';  // Ensure Link is imported here
+import { useNavigate, Link } from 'react-router-dom';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -12,14 +12,14 @@ const UserProfile = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.token) {
-      setNewEmail(user.email);
-      // Use Cloudinary URL directly if available, or set a default image path
-      const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
-      setProfileImageUrl(imageUrl);
+        setNewEmail(user.email);
+        const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
+        setProfileImageUrl(imageUrl);
     } else {
-      navigate('/');
+        navigate('/');
     }
-  }, [navigate]);
+}, [navigate]);
+
 
   const handleFileChange = (event) => {
     setProfileImage(event.target.files[0]);
@@ -55,7 +55,7 @@ const UserProfile = () => {
         const updatedUserResponse = await response.json();
         const updatedUser = { ...updatedUserResponse.user, token: user.token };
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        setProfileImageUrl(updatedUser.profile_image_path);  // Use the direct Cloudinary URL
+        setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
         alert('Profile updated successfully!');
     } catch (error) {
         console.error('Failed to update profile', error);
