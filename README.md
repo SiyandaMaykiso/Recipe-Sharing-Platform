@@ -7,6 +7,7 @@ The Recipe Sharing Platform is a web application that allows users to share thei
 
 * User Authentication: Secure login and registration functionality for users.
 * Recipe Management: Users can post, edit, and delete their recipes.
+* Users can create a profile picture for in account
 * Responsive Design: Optimized for various devices and screen sizes.
 * Image Upload: Integration with Cloudinary for efficient image handling.
 
