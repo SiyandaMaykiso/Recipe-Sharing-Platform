@@ -5,14 +5,14 @@ const UserProfile = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [newEmail, setNewEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [profileImage, setProfileImage] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState('');
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user && user.token) {
-      setNewEmail(user.email);
+      setEmail(user.email);
       const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
       setProfileImageUrl(imageUrl);
     } else {
@@ -33,7 +33,6 @@ const UserProfile = () => {
     const token = user ? user.token : null;
 
     const formData = new FormData();
-    formData.append('email', newEmail);
     if (profileImage) {
       formData.append('profileImage', profileImage);
     }
@@ -70,11 +69,8 @@ const UserProfile = () => {
       {profileImageUrl && (
         <img src={profileImageUrl} alt="Profile" style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '300px', margin: '20px auto', display: 'block' }} className="profile-image" />
       )}
+      <p style={{ margin: '10px 0', textAlign: 'center' }}>Email: {email}</p>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
-        <div className="form-control">
-          <label>Email:</label>
-          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} disabled={loading} style={{ padding: '10px', margin: '10px 0', border: '1px solid #ccc', borderRadius: '5px' }} />
-        </div>
         <div className="form-control">
           <label>Profile Image:</label>
           <input type="file" onChange={handleFileChange} disabled={loading} style={{ padding: '10px', margin: '10px 0' }} />
