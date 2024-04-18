@@ -18,6 +18,9 @@ app.use(cors());
 app.use(express.json());
 
 console.log("Setting up static file serving...");
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 console.log("Loading route handlers...");
@@ -27,17 +30,16 @@ app.use(ingredientRoutes);
 app.use(commentRoutes);
 app.use(ratingRoutes);
 
-app.get('/', (req, res) => {
-  console.log("Root route accessed.");
-  res.send('Recipe Sharing Platform API is running...');
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
-
 
 app.use((req, res, next) => {
   console.log("Handling 404 error.");
   res.status(404).send('Sorry, that route does not exist.');
 });
-
 
 app.use((err, req, res, next) => {
   console.error("An error occurred:", err.stack);
