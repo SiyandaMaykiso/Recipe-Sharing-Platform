@@ -34,30 +34,34 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-    console.log("Login attempt for:", email);
+    console.log("Received password:", password, typeof password);  // Check the type and value of the received password
+
     try {
         const user = await User.findByEmail(email);
         if (!user) {
-            console.log("Login failed: User not found.");
             return res.status(404).json({ message: 'User not found' });
         }
+
+        console.log("Stored password for comparison:", user.password);  // Debug: Check the stored password format
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            console.log("Login failed: Incorrect password.");
             return res.status(401).json({ message: 'Incorrect password' });
         }
+
         const token = generateAccessToken(user.user_id, user.email);
-        console.log("Login successful for:", user.email);
+        const { password: _, ...userInfo } = user; 
+
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: { userId: user.user_id, username: user.username, email: user.email }
+            user: userInfo
         });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Error during login:', error);
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 };
+
 
 exports.authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
