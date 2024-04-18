@@ -2,12 +2,15 @@ const { Pool } = require('pg');
 
 // Determine SSL usage based on environment
 const useSSL = process.env.NODE_ENV === 'production';
+const sslConfig = useSSL ? { rejectUnauthorized: false } : false;
+
+console.log("Database connection settings:");
+console.log("SSL Config:", sslConfig);
+console.log("Using DATABASE_URL from environment:", Boolean(process.env.DATABASE_URL));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: useSSL ? {
-    rejectUnauthorized: false // This is important to avoid "self-signed certificate" issues
-  } : false
+  ssl: sslConfig
 });
 
 module.exports = {

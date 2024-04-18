@@ -9,9 +9,14 @@ const ingredientRoutes = require('./routes/ingredientRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const ratingRoutes = require('./routes/ratingRoutes');
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
+
+// Debug: Log environment variables to verify they are loaded (Do not do this in production!)
+console.log("Loaded DATABASE_URL:", process.env.DATABASE_URL ? "Success" : "Failed");
+console.log("Loaded JWT_SECRET:", process.env.JWT_SECRET ? "Success" : "Failed");
 
 console.log("Configuring middleware...");
 app.use(cors());

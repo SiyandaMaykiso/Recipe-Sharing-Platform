@@ -3,11 +3,15 @@ const bcrypt = require('bcryptjs');  // Make sure bcryptjs is imported
 
 const User = {
   async create(username, email, password) {
-    const hashedPassword = await bcrypt.hash(password, 10);  // Hash the password with bcrypt
+    console.log("Hashing password");
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Password hashed:", hashedPassword);  // Log hashed password for debug
+
     const query = 'INSERT INTO Users(username, email, password) VALUES($1, $2, $3) RETURNING *';
-    const values = [username, email, hashedPassword];  // Use hashedPassword instead of password
+    const values = [username, email, hashedPassword];
     try {
       const { rows } = await db.query(query, values);
+      console.log("New user created:", rows[0]);  // Log newly created user info
       return rows[0];
     } catch (error) {
       console.error('Error creating user:', error);
@@ -20,6 +24,9 @@ const User = {
     const values = [email];
     try {
       const { rows } = await db.query(query, values);
+      if (rows.length > 0) {
+        console.log("User found by email:", rows[0]);  // Log user data found by email
+      }
       return rows[0];
     } catch (error) {
       console.error('Error finding user by email:', error);
@@ -32,6 +39,9 @@ const User = {
     const values = [userId];
     try {
       const { rows } = await db.query(query, values);
+      if (rows.length > 0) {
+        console.log("User found by ID:", rows[0]);  // Log user data found by ID
+      }
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('Error finding user by ID:', error);

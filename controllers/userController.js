@@ -3,70 +3,58 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const generateAccessToken = (id, email) => {
-    return jwt.sign(
-        { id, email }, 
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-    );
+    console.log(`Generating access token for user: ${id}`);
+    return jwt.sign({ id, email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
 exports.register = async (req, res) => {
-    console.log("Register endpoint hit", req.body);
     const { username, email, password } = req.body;
+    console.log("Attempting to register new user:", req.body);
     try {
-        console.log("Checking for existing user by email");
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
-            console.log("Existing user found");
+            console.log("Registration failed: Email already in use.");
             return res.status(409).json({ message: 'Email already in use' });
         }
-
-        console.log("Hashing password");
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("Creating new user");
+        console.log(`Password hashed: ${hashedPassword}`);
         const newUser = await User.create(username, email, hashedPassword);
         const token = generateAccessToken(newUser.user_id, newUser.email);
-
-        console.log("User created successfully", newUser);
+        console.log("Registration successful:", newUser);
         res.status(201).json({
             message: 'User created successfully',
-            user: {
-                userId: newUser.user_id,
-                username: newUser.username,
-                email: newUser.email
-            },
-            token: token
+            user: { userId: newUser.user_id, username: newUser.username, email: newUser.email },
+            token
         });
     } catch (error) {
-        console.error('Error registering new user:', error);
+        console.error('Registration error:', error);
         res.status(500).json({ message: 'Error registering new user', error: error.message });
     }
 };
 
-
 exports.login = async (req, res) => {
     const { email, password } = req.body;
+    console.log("Login attempt for:", email);
     try {
         const user = await User.findByEmail(email);
         if (!user) {
+            console.log("Login failed: User not found.");
             return res.status(404).json({ message: 'User not found' });
         }
-
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
+            console.log("Login failed: Incorrect password.");
             return res.status(401).json({ message: 'Incorrect password' });
         }
-
-        const token = generateAccessToken(user.user_id, user.email); 
-
-        const { password: _, ...userInfo } = user; 
-
+        const token = generateAccessToken(user.user_id, user.email);
+        console.log("Login successful for:", user.email);
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: userInfo
+            user: { userId: user.user_id, username: user.username, email: user.email }
         });
     } catch (error) {
+        console.error('Login error:', error);
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 };
