@@ -56,7 +56,7 @@ The Recipe Sharing Application is deployed and available for use here:
   ![Home Page](client/public/Recipe-Sharing-Platform-Homepage.png)
 
 * **Dashboard:**
-  ![Dashboard](client/public/Recipe-Sharing-Platform-Dashboard.png)
+  ![Dashboard](https://github.com/SiyandaMaykiso/Recipe-Sharing-Platform/blob/main/client/public/Recipe-Sharing-Platform-Dashboard.png)
 
 * **Add New Recipe:**
   ![Add New Recipe](client/public/Recipe-Sharing-Platform-Add-Recipe-Page.png)
