@@ -11,17 +11,23 @@ const generateAccessToken = (id, email) => {
 };
 
 exports.register = async (req, res) => {
+    console.log("Register endpoint hit", req.body);
     const { username, email, password } = req.body;
     try {
+        console.log("Checking for existing user by email");
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
+            console.log("Existing user found");
             return res.status(409).json({ message: 'Email already in use' });
         }
 
+        console.log("Hashing password");
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("Creating new user");
         const newUser = await User.create(username, email, hashedPassword);
         const token = generateAccessToken(newUser.user_id, newUser.email);
 
+        console.log("User created successfully", newUser);
         res.status(201).json({
             message: 'User created successfully',
             user: {
@@ -32,9 +38,11 @@ exports.register = async (req, res) => {
             token: token
         });
     } catch (error) {
+        console.error('Error registering new user:', error);
         res.status(500).json({ message: 'Error registering new user', error: error.message });
     }
 };
+
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
