@@ -54,3 +54,18 @@ The Recipe Sharing Application is deployed and available for use here:
 
 * **Home Page:**
   ![Home Page](client/public/Recipe-Sharing-Platform-Homepage.png)
+
+* **Dashboard:**
+  ![Dashboard](client/public/Recipe-Sharing-Platform-Dashboard.png)
+
+* **Add New Recipe:**
+  ![Add New Recipe](client/public/Recipe-Sharing-Platform-Add-Recipe-Page.png)
+
+* **Recipe Listing Page:**
+  ![Recipe Listing Page](client/public/Recipe-Sharing-Platform-RecipeListing-Page.png)
+
+* **Recipe Detail Page:**
+  ![Recipe Detail Page](client/public/Recipe-Sharing-Platform-Recipe-Detail-Page.png)
+
+* **User Profile Page:**
+  ![User Profile Page](client/public/Recipe-Sharing-Platform-UserProfile-Page.jpg)
