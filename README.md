@@ -51,3 +51,6 @@ The Recipe Sharing Application is deployed and available for use here:
 
 
 ## Application Screenshots
+
+* **Home Page:**
+  ![Home Page](client/public/Recipe-Sharing-Platform-Homepage.png)
