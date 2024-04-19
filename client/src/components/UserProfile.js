@@ -38,7 +38,7 @@ const UserProfile = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/user/profile', {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/user/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -53,7 +53,7 @@ const UserProfile = () => {
       const updatedUserResponse = await response.json();
       const updatedUser = { ...updatedUserResponse.user, token: user.token };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      setProfileImageUrl(`http://localhost:3000/${updatedUser.profile_image_path}`);
+      setProfileImageUrl(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/${updatedUser.profile_image_path}`);
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile', error);

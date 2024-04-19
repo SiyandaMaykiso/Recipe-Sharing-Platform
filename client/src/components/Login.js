@@ -11,7 +11,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/login', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
@@ -41,6 +41,7 @@ function Login() {
       setLoginError('Failed to login. Please check your credentials.');
     }
   };
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>

@@ -33,7 +33,7 @@ const Dashboard = () => {
 
     const fetchRecipes = async (token) => {
         try {
-            const response = await fetch('http://localhost:3000/recipes', {
+            const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -106,7 +106,7 @@ const Dashboard = () => {
         const token = user ? user.token : null;
     
         try {
-            const response = await fetch(`http://localhost:3000/recipes/${editFormData.recipe_id}`, {
+            const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${editFormData.recipe_id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -136,7 +136,7 @@ const Dashboard = () => {
     const deleteRecipe = async (recipeId) => {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:3000/recipes/${recipeId}`, {
+            const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${recipeId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,

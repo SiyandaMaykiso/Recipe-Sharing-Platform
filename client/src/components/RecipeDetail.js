@@ -11,7 +11,7 @@ const RecipeDetail = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`http://localhost:3000/recipes/${id}`);
+        const res = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${id}`);
         if (!res.ok) throw new Error('Failed to fetch recipe details');
         const data = await res.json();
         setRecipe(data);

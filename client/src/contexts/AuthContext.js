@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (formData) => {
     try {
-      const response = await fetch('http://localhost:3000/user/profile', {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/user/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,

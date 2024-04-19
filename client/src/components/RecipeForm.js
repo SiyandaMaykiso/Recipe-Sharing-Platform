@@ -47,7 +47,7 @@ const RecipeForm = ({ initialValues }) => {
         formData.append('user_id', userId);
 
         try {
-            const response = await fetch('http://localhost:3000/recipes', {
+            const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
                 method: 'POST',
                 body: formData,
                 headers: {

@@ -14,7 +14,7 @@ const RecipeListings = () => {
     } else {
       const fetchRecipes = async () => {
         try {
-          const response = await fetch('http://localhost:3000/recipes', {
+          const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
             headers: {
               'Authorization': `Bearer ${token}`
             }

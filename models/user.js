@@ -23,9 +23,12 @@ const User = {
     const query = 'SELECT * FROM Users WHERE email = $1';
     const values = [email];
     try {
+      console.log("Executing findByEmail with email:", email);  // Log the email being used in the query
       const { rows } = await db.query(query, values);
       if (rows.length > 0) {
         console.log("User found by email:", rows[0]);  // Log user data found by email
+      } else {
+        console.log("No user found for email:", email);  // Log when no user is found
       }
       return rows[0];
     } catch (error) {
@@ -33,7 +36,7 @@ const User = {
       throw error;
     }
   },
-
+  
   async findById(userId) {
     const query = 'SELECT * FROM Users WHERE user_id = $1';
     const values = [userId];

@@ -22,33 +22,27 @@ function App() {
 
   const handleRecipeFormSubmit = async (values, setFormError) => {
     try {
-    
       const token = localStorage.getItem('token');
 
-      
-      const response = await fetch('http://localhost:3000/recipes', {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          
           'Authorization': `Bearer ${token || ''}`,
         },
         body: JSON.stringify(values),
       });
 
       if (!response.ok) {
-        
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to create recipe');
       }
 
       const recipe = await response.json();
       console.log('Recipe created successfully', recipe);
-      
     } catch (error) {
       console.error('Failed to create recipe:', error);
       if (setFormError) {
-      
         setFormError(error.message || 'An unexpected error occurred. Please try again.');
       }
     }
