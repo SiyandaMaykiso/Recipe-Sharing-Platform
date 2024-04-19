@@ -79,27 +79,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchUserDetails = async () => {
-    try {
-      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/user', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user details');
-      }
-
-      const userData = await response.json();
-      setCurrentUser(userData); // Assuming the response matches the expected user object format
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
-
   const value = {
     currentUser,
     login,
@@ -107,7 +86,6 @@ export const AuthProvider = ({ children }) => {
     getAuthHeader,
     updateProfile,
     setUserAndToken,
-    fetchUserDetails, // Expose the new function to be used by components
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
