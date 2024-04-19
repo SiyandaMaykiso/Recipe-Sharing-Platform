@@ -10,25 +10,34 @@ const RecipeListings = () => {
     const token = user ? user.token : null;
 
     if (!token) {
+      console.error('No token available');
       navigate('/login');
-    } else {
-      const fetchRecipes = async () => {
-        try {
-          const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          if (!response.ok) throw new Error('Failed to fetch recipes');
-          const data = await response.json();
-          setRecipes(data);
-        } catch (error) {
-          console.error("Error fetching recipes:", error);
-        }
-      };
-
-      fetchRecipes();
+      return;
     }
+
+    console.log("Sending token:", token); // Debug token value
+
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log("Response status:", response.status); // Debug response status
+
+        if (!response.ok) throw new Error(`Failed to fetch recipes: ${response.statusText}`);
+
+        const data = await response.json();
+        setRecipes(data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
+    };
+
+    fetchRecipes();
   }, [navigate]);
 
   return (
