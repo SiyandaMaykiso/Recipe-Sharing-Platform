@@ -10,14 +10,35 @@ const UserProfile = () => {
   const [profileImageUrl, setProfileImageUrl] = useState('');
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user && user.token) {
-      setEmail(user.email);
-      const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
-      setProfileImageUrl(imageUrl);
-    } else {
-      navigate('/');
-    }
+    const fetchUserProfile = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.token) {
+        try {
+          const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/user/profile', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${user.token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile');
+          }
+
+          const data = await response.json();
+          setEmail(data.email);
+          const imageUrl = data.profile_image_path ? `https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/${data.profile_image_path}` : '/path/to/default/profileImage';
+          setProfileImageUrl(imageUrl);
+        } catch (error) {
+          console.error('Failed to fetch profile', error);
+          setError('Failed to fetch profile. Please try again.');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    fetchUserProfile();
   }, [navigate]);
 
   const handleFileChange = (event) => {
@@ -51,7 +72,7 @@ const UserProfile = () => {
       }
 
       const updatedUserResponse = await response.json();
-      const updatedUser = { ...updatedUserResponse.user, token: user.token };
+      const updatedUser = { ...updatedUserResponse, token: user.token }; // Assuming token is not updated on profile update
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setProfileImageUrl(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/${updatedUser.profile_image_path}`);
       alert('Profile updated successfully!');
