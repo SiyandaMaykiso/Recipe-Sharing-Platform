@@ -6,29 +6,33 @@ const RecipeListings = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user ? user.token : null;
+    const loadRecipes = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const token = user ? user.token : null;
 
-    if (!token) {
-      console.error('No token available');
-      navigate('/login');
-      return;
-    }
+      if (!token) {
+        console.error('No token available. Redirecting to login.');
+        navigate('/login');
+        return;
+      }
 
-    console.log("Sending token:", token); // Debug token value
+      console.log("Sending token:", token); // Debug: Log the token to ensure it's being sent
 
-    const fetchRecipes = async () => {
       try {
         const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+          method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
 
-        console.log("Response status:", response.status); // Debug response status
+        console.log("Response status:", response.status); // Debug: Log the response status
 
-        if (!response.ok) throw new Error(`Failed to fetch recipes: ${response.statusText}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch recipes: ${response.status} ${errorText}`);
+        }
 
         const data = await response.json();
         setRecipes(data);
@@ -37,7 +41,7 @@ const RecipeListings = () => {
       }
     };
 
-    fetchRecipes();
+    loadRecipes();
   }, [navigate]);
 
   return (
