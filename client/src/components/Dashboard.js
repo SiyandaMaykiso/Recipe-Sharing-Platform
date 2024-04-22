@@ -15,19 +15,22 @@ const Dashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
+    // Retrieve token from localStorage
+    const getTokenFromLocalStorage = () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user ? user.token : null;
+    };
+
+    // useEffect is now dependent on getTokenFromLocalStorage function
     useEffect(() => {
         const token = getTokenFromLocalStorage();
+        console.log("Token on load:", token); // Debugging line to check the token
         if (!token) {
             navigate('/login');
         } else {
             fetchRecipes(token);
         }
-    }, [navigate]);
-
-    const getTokenFromLocalStorage = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        return user ? user.token : null;
-    };
+    }, [getTokenFromLocalStorage, navigate]); // Adding getTokenFromLocalStorage to dependency array
 
     const fetchRecipes = async (token) => {
         try {
@@ -56,7 +59,6 @@ const Dashboard = () => {
         });
 
          window.scrollTo(0, 0);
-
     };
 
     const handleEditFormChange = (event) => {
@@ -64,7 +66,6 @@ const Dashboard = () => {
         if (name === "recipeImage") {
             handleImageChange(event);
         } else {
-            
             setEditFormData(prev => ({
                 ...prev,
                 [name]: value !== '' ? value : prev[name]
@@ -74,15 +75,14 @@ const Dashboard = () => {
             }
         }
     };
-    
+
     const handleImageChange = (event) => {
-      
         setEditFormData(prevFormData => ({
             ...prevFormData,
             image: event.target.files[0] 
         }));
     };
-    
+
     const autoExpandTextArea = (element) => {
         element.style.height = 'inherit';
         element.style.height = `${element.scrollHeight}px`; 
@@ -100,8 +100,7 @@ const Dashboard = () => {
             formData.append('recipeImage', editFormData.image);
         }
     
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = user ? user.token : null;
+        const token = getTokenFromLocalStorage();
     
         try {
             const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${editFormData.recipe_id}`, {
@@ -132,7 +131,7 @@ const Dashboard = () => {
     };
 
     const deleteRecipe = async (recipeId) => {
-        const token = localStorage.getItem('token');
+        const token = getTokenFromLocalStorage();
         try {
             const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${recipeId}`, {
                 method: 'DELETE',
