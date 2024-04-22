@@ -26,8 +26,6 @@ console.log("Setting up static file serving...");
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 console.log("Loading route handlers...");
 app.use(userRoutes);
 app.use(recipeRoutes);
