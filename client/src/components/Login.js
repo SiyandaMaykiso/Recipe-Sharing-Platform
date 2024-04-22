@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';  // Make sure the path is correct
+import { useAuth } from '../contexts/AuthContext';  // Make sure the path is correct
 
 function Login() {
   const { login } = useAuth();  // Using login from AuthContext
