@@ -13,6 +13,11 @@ const RecipeForm = ({ initialValues }) => {
         setSelectedFile(event.target.files[0]);
     };
 
+    const handleAutoExpand = (event) => {
+        event.target.style.height = 'inherit';
+        event.target.style.height = `${event.target.scrollHeight}px`;
+    };
+
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         const formData = new FormData();
         formData.append('title', values.title);
@@ -55,19 +60,34 @@ const RecipeForm = ({ initialValues }) => {
     };
 
     return (
-        <div className="recipe-form-container">
+        <div className="recipe-form-container container">
             <h2>Add New Recipe</h2>
             {successMessage && <div className="success-message">{successMessage}</div>}
-            <Formik initialValues={initialValues || { title: '', description: '', ingredients: '', instructions: '' }} onSubmit={handleSubmit}>
+            <Formik initialValues={initialValues || { title: '', description: '', ingredients: '', instructions: '' }} onSubmit={handleSubmit} enableReinitialize>
                 {({ isSubmitting }) => (
-                    <Form>
-                        <Field name="title" placeholder="Recipe Title" type="text" />
-                        <Field name="description" as="textarea" placeholder="Recipe Description" />
-                        <Field name="ingredients" as="textarea" placeholder="List all ingredients" />
-                        <Field name="instructions" as="textarea" placeholder="Cooking Instructions" />
-                        <input type="file" name="recipeImage" onChange={handleFileChange} />
+                    <Form className="form">
+                        <div className="form-control">
+                            <label htmlFor="title">Title</label>
+                            <Field id="title" name="title" placeholder="Recipe Title" />
+                        </div>
+                        <div className="form-control">
+                            <label htmlFor="description">Description</label>
+                            <Field id="description" name="description" as="textarea" placeholder="Recipe Description" onInput={handleAutoExpand} />
+                        </div>
+                        <div className="form-control">
+                            <label htmlFor="ingredients">Ingredients</label>
+                            <Field id="ingredients" name="ingredients" as="textarea" placeholder="List all ingredients" onInput={handleAutoExpand} />
+                        </div>
+                        <div className="form-control">
+                            <label htmlFor="instructions">Instructions</label>
+                            <Field id="instructions" name="instructions" as="textarea" placeholder="Cooking Instructions" onInput={handleAutoExpand} />
+                        </div>
+                        <div className="form-control">
+                            <label htmlFor="recipeImage">Recipe Image</label>
+                            <input id="recipeImage" name="recipeImage" type="file" onChange={handleFileChange} className="input-file" />
+                        </div>
                         {submissionError && <div className="error-message">{submissionError}</div>}
-                        <button type="submit" disabled={isSubmitting}>Submit</button>
+                        <button type="submit" disabled={isSubmitting} className="btn btn-primary">Submit</button>
                         <Link to="/dashboard" className="btn btn-secondary">Back to Dashboard</Link>
                     </Form>
                 )}
