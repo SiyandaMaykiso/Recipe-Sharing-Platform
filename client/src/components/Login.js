@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';  // Make sure the path is correct
 
 function Login() {
+  const { login } = useAuth();  // Using login from AuthContext
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,37 +13,14 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/login', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-          throw new Error(response.statusText || 'Login failed');
-      }
-
-      const data = await response.json();
-
-      if (data.token && data.user && data.user.user_id) {
-          localStorage.setItem('user', JSON.stringify({
-            user_id: data.user.user_id,
-            token: data.token,
-            email: data.user.email,
-            profile_image_path: data.user.profile_image_path
-          }));
-          navigate('/dashboard');
-      } else {
-          throw new Error('Login response missing user ID or token');
-      }
+      // Use the login function from the context
+      await login(email, password);
+      navigate('/dashboard');  // Redirect on successful login
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError('Failed to login. Please check your credentials.');
+      setLoginError(error.message || 'Failed to login. Please check your credentials.');
     }
   };
-
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>

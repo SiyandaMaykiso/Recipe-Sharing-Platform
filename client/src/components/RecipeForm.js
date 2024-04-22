@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';  // Make sure the path to AuthContext is correct
 
 const RecipeForm = ({ initialValues }) => {
+    const { authToken } = useAuth(); // Using authToken from AuthContext
     const [selectedFile, setSelectedFile] = useState(null);
     const [submissionError, setSubmissionError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -22,10 +24,7 @@ const RecipeForm = ({ initialValues }) => {
             formData.append('recipeImage', selectedFile);
         }
 
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = user ? user.token : null;
-
-        if (!token) {
+        if (!authToken) {
             console.error('Token not found');
             setSubmissionError('Authentication required. Please log in again.');
             setSubmitting(false);
@@ -35,17 +34,18 @@ const RecipeForm = ({ initialValues }) => {
         try {
             const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
+                headers: { 'Authorization': `Bearer ${authToken}` },
                 body: formData,
             });
 
             if (!response.ok) {
-                throw new Error('Failed to submit recipe');
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message || 'Failed to submit recipe');
             }
 
             const result = await response.json();
             setSuccessMessage('Recipe successfully uploaded!');
-            resetForm();
+            resetForm({});
         } catch (error) {
             console.error('Submission error:', error);
             setSubmissionError(error.message || 'An unexpected error occurred. Please try again.');
@@ -58,17 +58,17 @@ const RecipeForm = ({ initialValues }) => {
         <div className="recipe-form-container">
             <h2>Add New Recipe</h2>
             {successMessage && <div className="success-message">{successMessage}</div>}
-            <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
+            <Formik initialValues={initialValues || { title: '', description: '', ingredients: '', instructions: '' }} onSubmit={handleSubmit}>
                 {({ isSubmitting }) => (
                     <Form>
-                        <Field name="title" placeholder="Recipe Title" />
+                        <Field name="title" placeholder="Recipe Title" type="text" />
                         <Field name="description" as="textarea" placeholder="Recipe Description" />
                         <Field name="ingredients" as="textarea" placeholder="List all ingredients" />
                         <Field name="instructions" as="textarea" placeholder="Cooking Instructions" />
                         <input type="file" name="recipeImage" onChange={handleFileChange} />
                         {submissionError && <div className="error-message">{submissionError}</div>}
                         <button type="submit" disabled={isSubmitting}>Submit</button>
-                        <Link to="/dashboard">Back to Dashboard</Link>
+                        <Link to="/dashboard" className="btn btn-secondary">Back to Dashboard</Link>
                     </Form>
                 )}
             </Formik>

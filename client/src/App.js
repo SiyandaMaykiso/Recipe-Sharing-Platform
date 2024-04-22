@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
 import RecipeForm from './components/RecipeForm';
@@ -11,8 +11,6 @@ import Dashboard from './components/Dashboard';
 import RecipeDetail from './components/RecipeDetail';
 import RecipeListings from './components/RecipeListings';
 
-console.log("Starting the application...");
-
 // Helper component for private routes
 function PrivateRoute({ children }) {
   const { authToken } = useAuth();
@@ -20,23 +18,13 @@ function PrivateRoute({ children }) {
 }
 
 function App() {
-  const recipeFormInitialValues = {
-    title: '',
-    description: '',
-    ingredients: '',
-    instructions: ''
-  };
-
+  // No need to pass initial values from App.js, handle it inside RecipeForm itself
   return (
     <Router>
       <AuthProvider>
         <Routes>
           <Route path="/user" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
-          <Route path="/add-recipe" element={
-            <PrivateRoute>
-              <RecipeForm initialValues={recipeFormInitialValues} />
-            </PrivateRoute>
-          } />
+          <Route path="/add-recipe" element={<PrivateRoute><RecipeForm /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />

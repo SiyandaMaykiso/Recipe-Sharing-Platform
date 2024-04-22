@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Correct the path to AuthContext as necessary
+import { useAuth } from '../contexts/AuthContext'; // Ensure the path to AuthContext is correct
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
   const navigate = useNavigate();
-  const { authToken, loading } = useAuth(); // Retrieve loading state along with authToken
+  const { authToken, loading } = useAuth(); // Access loading and authToken from AuthContext
 
   useEffect(() => {
-    if (loading) {
-      console.log('Authentication context is still loading.');
-      return; // Return early while the auth context is loading
-    }
-
-    if (!authToken) {
-      console.error('No token available. Redirecting to login.');
-      navigate('/login');
+    if (loading || !authToken) {
+      if (!authToken) navigate('/login'); // Navigate to login if no authToken
       return;
     }
-
-    console.log('Using token from context:', authToken);
 
     const fetchRecipes = async () => {
       try {
@@ -31,10 +23,7 @@ const RecipeListings = () => {
           }
         });
 
-        if (!response.ok) {
-          const errorResponse = await response.text();
-          throw new Error(`Failed to fetch recipes: ${response.status} ${errorResponse}`);
-        }
+        if (!response.ok) throw new Error(`Failed to fetch recipes: ${response.status}`);
 
         const data = await response.json();
         setRecipes(data);
@@ -44,7 +33,7 @@ const RecipeListings = () => {
     };
 
     fetchRecipes();
-  }, [navigate, authToken, loading]); // Include loading in the dependency array
+  }, [navigate, authToken, loading]); // Depend on authToken and loading
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Correct the path to AuthContext as necessary
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
-    const { authToken, loading } = useAuth();  // Access loading from the context
+    const { authToken, loading } = useAuth();
     const [recipes, setRecipes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editFormData, setEditFormData] = useState({
@@ -18,10 +18,8 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     const fetchRecipes = useCallback(async () => {
-        if (loading) return;  // Check if context is still loading and return early
-        if (!authToken) {
-            console.error('No authToken found, redirecting to login.');
-            navigate('/login');
+        if (loading || !authToken) {
+            if (!authToken) navigate('/login');
             return;
         }
 
@@ -34,17 +32,14 @@ const Dashboard = () => {
                 },
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to fetch recipes: ${response.status} ${errorText}`);
-            }
+            if (!response.ok) throw new Error('Failed to fetch recipes');
 
             const data = await response.json();
             setRecipes(data);
         } catch (error) {
             console.error("Error fetching recipes:", error);
         }
-    }, [authToken, navigate, loading]);  // Include loading in the dependency array
+    }, [authToken, navigate, loading]);
 
     useEffect(() => {
         fetchRecipes();
@@ -59,46 +54,28 @@ const Dashboard = () => {
             ingredients: recipe.ingredients || '',
             instructions: recipe.instructions || '',
         });
-        window.scrollTo(0, 0);
     };
 
-    const handleEditFormChange = (event) => {
+    const handleFormChange = (event) => {
         const { name, value } = event.target;
-        if (name === "recipeImage") {
-            handleImageChange(event);
-        } else {
-            setEditFormData(prev => ({
-                ...prev,
-                [name]: value !== '' ? value : prev[name]
-            }));
-            if (event.target.tagName.toLowerCase() === 'textarea') {
-                autoExpandTextArea(event.target);
-            }
-        }
+        setEditFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     const handleImageChange = (event) => {
-        setEditFormData(prevFormData => ({
-            ...prevFormData,
+        setEditFormData((prev) => ({
+            ...prev,
             image: event.target.files[0]
         }));
     };
 
-    const autoExpandTextArea = (element) => {
-        element.style.height = 'inherit';
-        element.style.height = `${element.scrollHeight}px`;
-    };
-
-    const saveEdit = async (event) => {
-        event.preventDefault();
+    const saveEdit = async () => {
         const formData = new FormData();
-        formData.append('title', editFormData.title);
-        formData.append('description', editFormData.description);
-        formData.append('ingredients', editFormData.ingredients);
-        formData.append('instructions', editFormData.instructions);
-        if (editFormData.image) {
-            formData.append('recipeImage', editFormData.image);
-        }
+        Object.entries(editFormData).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
 
         try {
             const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${editFormData.recipe_id}`, {
@@ -109,18 +86,12 @@ const Dashboard = () => {
                 body: formData,
             });
 
-            if (!response.ok) {
-                const errorResponse = await response.json();
-                console.error("Error updating recipe:", errorResponse);
-                setSuccessMessage(errorResponse.message || 'Failed to update the recipe. Please try again.');
-                setTimeout(() => setSuccessMessage(''), 5000);
-                return;
-            }
+            if (!response.ok) throw new Error('Failed to update recipe');
 
+            setSuccessMessage('Recipe updated successfully!');
+            setTimeout(() => setSuccessMessage(''), 5000);
             fetchRecipes();
             setIsEditing(false);
-            setSuccessMessage('Recipe updated successfully!');
-            setTimeout(() => setSuccessMessage(''), 3000);
         } catch (error) {
             console.error("Error updating recipe:", error);
             setSuccessMessage('Failed to update the recipe. Please try again.');
@@ -136,10 +107,16 @@ const Dashboard = () => {
                     'Authorization': `Bearer ${authToken}`,
                 },
             });
-            if (!response.ok) throw new Error('Failed to delete the recipe');
+
+            if (!response.ok) throw new Error('Failed to delete recipe');
+
+            setSuccessMessage('Recipe deleted successfully!');
+            setTimeout(() => setSuccessMessage(''), 5000);
             fetchRecipes();
         } catch (error) {
             console.error("Error deleting recipe:", error);
+            setSuccessMessage('Failed to delete the recipe. Please try again.');
+            setTimeout(() => setSuccessMessage(''), 5000);
         }
     };
 
@@ -156,58 +133,23 @@ const Dashboard = () => {
                 <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data" className="form-container">
                     <div className="form-control">
                         <label>Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={editFormData.title}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                        />
+                        <input type="text" name="title" value={editFormData.title} onChange={handleFormChange} className="ingredient-input" />
                     </div>
                     <div className="form-control">
                         <label>Description</label>
-                        <textarea
-                            name="description"
-                            value={editFormData.description}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                            style={{ overflow: 'hidden', resize: 'none' }}
-                            onInput={(e) => {
-                                e.target.style.height = 'inherit';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                            }}
-                        />
+                        <textarea name="description" value={editFormData.description} onChange={handleFormChange} className="ingredient-input" />
                     </div>
                     <div className="form-control">
                         <label>Ingredients</label>
-                        <textarea
-                            name="ingredients"
-                            value={editFormData.ingredients}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                        />
+                        <textarea name="ingredients" value={editFormData.ingredients} onChange={handleFormChange} className="ingredient-input" />
                     </div>
                     <div className="form-control">
                         <label>Instructions</label>
-                        <textarea
-                            name="instructions"
-                            value={editFormData.instructions}
-                            onChange={handleEditFormChange}
-                            className="ingredient-input"
-                            style={{ overflow: 'hidden', resize: 'both' }}
-                            onInput={(e) => {
-                                e.target.style.height = 'inherit';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                            }}
-                        />
+                        <textarea name="instructions" value={editFormData.instructions} onChange={handleFormChange} className="ingredient-input" />
                     </div>
                     <div className="form-control">
                         <label htmlFor="image">Recipe Image</label>
-                        <input
-                            type="file"
-                            name="recipeImage"
-                            onChange={handleEditFormChange}
-                        />
+                        <input type="file" name="recipeImage" onChange={handleImageChange} />
                     </div>
                     <button type="button" onClick={saveEdit} className="btn">Save</button>
                 </form>
