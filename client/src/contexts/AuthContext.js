@@ -10,6 +10,22 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
 
+  // Initialize auth from localStorage on mount
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const storedToken = localStorage.getItem('token');
+      if (storedUser && storedToken) {
+        setCurrentUser(storedUser);
+        setAuthToken(storedToken);
+      } else {
+        logout(); // Cleanup state if no valid user or token is found
+      }
+    };
+
+    initAuth();
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('user', JSON.stringify(currentUser));
     localStorage.setItem('token', authToken);
