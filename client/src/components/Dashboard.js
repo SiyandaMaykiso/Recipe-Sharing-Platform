@@ -22,16 +22,20 @@ const Dashboard = () => {
     };
 
     // useEffect is now dependent on getTokenFromLocalStorage function
+    
     useEffect(() => {
+        console.log("Checking token status...");
         const token = getTokenFromLocalStorage();
         console.log("Token on load:", token); // Debugging line to check the token
         if (!token) {
+            console.log("No token found, navigating to login.");
             navigate('/login');
         } else {
+            console.log("Token found, fetching recipes.");
             fetchRecipes(token);
         }
     }, [getTokenFromLocalStorage, navigate]); // Adding getTokenFromLocalStorage to dependency array
-
+    
     const fetchRecipes = async (token) => {
         try {
             const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {

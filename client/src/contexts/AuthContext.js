@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // Export the AuthContext for use in components that consume the context directly
 export const AuthContext = createContext();
@@ -14,14 +14,22 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize auth from localStorage on mount
   useEffect(() => {
-    const initAuth = async () => {
+    const initAuth = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const storedToken = localStorage.getItem('token');
-      if (storedUser && storedToken) {
-        setCurrentUser(storedUser);
-        setAuthToken(storedToken);
-      } else {
-        logout(); // Cleanup state if no valid user or token is found
+      if (storedUser || storedToken) {
+        if (storedUser && storedToken) {
+          setCurrentUser(storedUser);
+          setAuthToken(storedToken);
+        } else {
+          if (!storedUser) {
+            localStorage.removeItem('user');  // Remove user if no token is present
+          }
+          if (!storedToken) {
+            localStorage.removeItem('token');  // Remove token if no user is present
+          }
+          logout(); // Cleanup state if no valid user or token is found
+        }
       }
     };
 
@@ -30,8 +38,16 @@ export const AuthProvider = ({ children }) => {
 
   // Persist user and token changes to localStorage
   useEffect(() => {
-    localStorage.setItem('user', JSON.stringify(currentUser));
-    localStorage.setItem('token', authToken);
+    if (currentUser) {
+      localStorage.setItem('user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('user');
+    }
+    if (authToken) {
+      localStorage.setItem('token', authToken);
+    } else {
+      localStorage.removeItem('token');
+    }
   }, [currentUser, authToken]);
 
   const login = async (email, password) => {
@@ -57,18 +73,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setCurrentUser(null);
-    setAuthToken('');
-  };
+    setAuthToken(null);
+  }, []);
 
   const setUserAndToken = (user, token) => {
     setCurrentUser(user);
     setAuthToken(token);
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
   };
 
   const getAuthHeader = () => {
