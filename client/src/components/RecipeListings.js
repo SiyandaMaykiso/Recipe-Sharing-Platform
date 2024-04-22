@@ -1,34 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext'; // Assuming you have an AuthContext
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
-  const [redirect, setRedirect] = useState(false);
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext); // Use context to manage user state
 
   useEffect(() => {
-    console.log('Checking user token on Recipe Listings:', localStorage.getItem('token'));
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user ? user.token : null;
-
-    if (!token) {
+    if (!currentUser || !currentUser.token) {
       console.error('No token available. Redirecting to login.');
-      setRedirect(true);
+      navigate('/login');
       return;
     }
 
+    console.log('Using token from context:', currentUser.token);
+
     const fetchRecipes = async () => {
-      console.log("Using token:", token); // Additional logging for token usage
       try {
         const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${currentUser.token}`,
             'Content-Type': 'application/json'
           }
         });
-
-        console.log("Response status on fetching recipes:", response.status); // Debug: Log the response status
 
         if (!response.ok) {
           const errorResponse = await response.text();
@@ -39,18 +35,12 @@ const RecipeListings = () => {
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
-        setRedirect(true);
+        navigate('/login'); // Redirect to login on failure
       }
     };
 
     fetchRecipes();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (redirect) {
-      navigate('/login');
-    }
-  }, [redirect, navigate]);
+  }, [navigate, currentUser]);
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
