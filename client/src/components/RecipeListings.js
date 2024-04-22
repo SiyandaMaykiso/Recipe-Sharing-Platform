@@ -35,7 +35,6 @@ const RecipeListings = () => {
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
-        navigate('/login'); // Redirect to login on failure
       }
     };
 
