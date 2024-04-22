@@ -6,6 +6,7 @@ const RecipeListings = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Checking user token on Recipe Listings:', localStorage.getItem('token'));
     const user = JSON.parse(localStorage.getItem('user'));
     const token = user ? user.token : null;
 
@@ -25,15 +26,18 @@ const RecipeListings = () => {
           }
         });
 
+        console.log("Response status on fetching recipes:", response.status); // Debug: Log the response status
+
         if (!response.ok) {
-          throw new Error('Failed to fetch recipes');
+          const errorResponse = await response.text();
+          throw new Error(`Failed to fetch recipes: ${response.status} ${errorResponse}`);
         }
 
         const data = await response.json();
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
-        navigate('/login'); // Redirect to login on failure, similar to Dashboard
+        navigate('/login'); // Redirect to login on failure
       }
     };
 
