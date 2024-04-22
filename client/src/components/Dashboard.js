@@ -18,28 +18,39 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!authToken) {
-            navigate('/login');
-        } else {
-            fetchRecipes();
-        }
+        const fetchRecipes = async () => {
+            if (!authToken) {
+                console.error('No authToken found, redirecting to login.');
+                navigate('/login');
+                return;
+            }
+    
+            try {
+                const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+    
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Failed to fetch recipes: ${response.status} ${errorText}`);
+                }
+    
+                const data = await response.json();
+                setRecipes(data);
+            } catch (error) {
+                console.error("Error fetching recipes:", error);
+                if (response.status === 403 || response.status === 401) {
+                    navigate('/login'); // Navigate to login if token is invalid or expired
+                }
+            }
+        };
+    
+        fetchRecipes();
     }, [authToken, navigate]);
-
-    const fetchRecipes = async () => {
-        try {
-            const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                },
-            });
-            if (!response.ok) throw new Error('Failed to fetch recipes');
-            const data = await response.json();
-            setRecipes(data);
-        } catch (error) {
-            console.error("Error fetching recipes:", error);
-        }
-    };
 
     const startEdit = (recipe) => {
         setIsEditing(true);
