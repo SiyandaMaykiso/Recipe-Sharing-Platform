@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
 import RecipeForm from './components/RecipeForm';
 import Home from './components/Home';
@@ -13,7 +13,15 @@ import RecipeListings from './components/RecipeListings';
 
 console.log("Starting the application...");
 
+// Helper component for private routes
+const PrivateRoute = ({ children }) => {
+  const { authToken } = useAuth();
+  return authToken ? children : <Navigate to="/login" />;
+};
+
 function App() {
+  const { authToken } = useAuth(); // Assuming useAuth is exported correctly and can be used here
+
   const recipeFormInitialValues = {
     title: '',
     description: '',
@@ -22,13 +30,11 @@ function App() {
 
   const handleRecipeFormSubmit = async (values, setFormError) => {
     try {
-      const token = localStorage.getItem('token');
-
       const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token || ''}`,
+          'Authorization': `Bearer ${authToken || ''}`, // Use authToken from context
         },
         body: JSON.stringify(values),
       });
@@ -52,14 +58,14 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/user" element={<UserProfile />} />
-          <Route path="/add-recipe" element={<RecipeForm initialValues={recipeFormInitialValues} onSubmit={handleRecipeFormSubmit} />} />
+          <Route path="/user" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+          <Route path="/add-recipe" element={<PrivateRoute><RecipeForm initialValues={recipeFormInitialValues} onSubmit={handleRecipeFormSubmit} /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/recipes" element={<RecipeListings />} />
-          <Route path="/recipes/:id" element={<RecipeDetail />} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/recipes" element={<PrivateRoute><RecipeListings /></PrivateRoute>} />
+          <Route path="/recipes/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
         </Routes>
       </AuthProvider>
     </Router>
