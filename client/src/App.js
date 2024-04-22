@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext'; // Ensure useAuth is imported
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import UserProfile from './components/UserProfile';
 import RecipeForm from './components/RecipeForm';
 import Home from './components/Home';
@@ -15,11 +15,18 @@ console.log("Starting the application...");
 
 // Helper component for private routes
 function PrivateRoute({ children }) {
-  const { authToken } = useAuth(); // Correct usage of useAuth inside a component
+  const { authToken } = useAuth();
   return authToken ? children : <Navigate to="/login" />;
 }
 
 function App() {
+  const recipeFormInitialValues = {
+    title: '',
+    description: '',
+    ingredients: '',
+    instructions: ''
+  };
+
   return (
     <Router>
       <AuthProvider>
@@ -27,7 +34,7 @@ function App() {
           <Route path="/user" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
           <Route path="/add-recipe" element={
             <PrivateRoute>
-              <RecipeForm />
+              <RecipeForm initialValues={recipeFormInitialValues} />
             </PrivateRoute>
           } />
           <Route path="/login" element={<Login />} />
