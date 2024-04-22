@@ -1,44 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Ensure the path to AuthContext is correct
+import { useAuth } from '../contexts/AuthContext';
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
   const navigate = useNavigate();
-  const { authToken, loading } = useAuth(); // Access loading and authToken from AuthContext
+  const { authToken, loading } = useAuth();
+
+  // Define fetchRecipes using useCallback at the top level of the component
+  const fetchRecipes = useCallback(async () => {
+    if (loading || !authToken) {
+      if (!authToken) navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error(`Failed to fetch recipes: ${response.status}`);
+
+      const data = await response.json();
+      setRecipes(data);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  }, [authToken, navigate, loading]);
 
   useEffect(() => {
-    const fetchRecipes = useCallback(async () => {
-      if (loading) {
-        console.log('Still loading, fetch postponed.');
-        return; // Return while still loading
-      }
-      if (!authToken) {
-        console.error('No token available. Redirecting to login.');
-        navigate('/login');
-        return;
-      }
-  
-      try {
-        const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Failed to fetch recipes: ${response.status}`);
-        }
-  
-        const data = await response.json();
-        setRecipes(data);
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      }
-    }, [authToken, navigate, loading]);
-  
     fetchRecipes();
   }, [fetchRecipes]);
 
