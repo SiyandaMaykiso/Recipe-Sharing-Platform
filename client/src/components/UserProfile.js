@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // Ensure correct path to AuthContext
 
 const UserProfile = () => {
+  const { currentUser, authToken, logout } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
   const [profileImage, setProfileImage] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState('');
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user && user.token) {
-      setEmail(user.email);
-      const imageUrl = user.profile_image_path ? user.profile_image_path : '/path/to/default/profileImage';
-      setProfileImageUrl(imageUrl);
-    } else {
-      navigate('/');
+    if (!currentUser || !authToken) {
+      navigate('/login');
     }
-  }, [navigate]);
+  }, [currentUser, authToken, navigate]);
 
   const handleFileChange = (event) => {
     setProfileImage(event.target.files[0]);
@@ -26,11 +21,8 @@ const UserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = user ? user.token : null;
+    setError('');
 
     const formData = new FormData();
     if (profileImage) {
@@ -41,46 +33,47 @@ const UserProfile = () => {
       const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/user/profile', {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${authToken}`,
         },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.message || 'Failed to update profile');
       }
 
-      const updatedUserResponse = await response.json();
-      const updatedUser = { ...updatedUserResponse.user, token: user.token };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setProfileImageUrl(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/${updatedUser.profile_image_path}`);
+      const updatedUser = await response.json();
       alert('Profile updated successfully!');
+      // Assuming you have a method to update currentUser in context
+      // updateUser(updatedUser); 
+      navigate('/dashboard'); // Refresh or navigate to reflect changes
     } catch (error) {
       console.error('Failed to update profile', error);
-      setError('Failed to update profile. Please try again.');
+      setError(error.message || 'Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="user-profile-container centered-content" style={{ maxWidth: '600px', margin: 'auto', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '10px', backgroundColor: '#fff' }}>
-      <h1 style={{ textAlign: 'center' }}>User Profile</h1>
-      {profileImageUrl && (
-        <img src={profileImageUrl} alt="Profile" style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '300px', margin: '20px auto', display: 'block' }} className="profile-image" />
+    <div className="user-profile-container" style={{ maxWidth: '600px', margin: 'auto', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', borderRadius: '10px', backgroundColor: '#fff' }}>
+      <h1>User Profile</h1>
+      {currentUser?.profile_image_path && (
+        <img src={currentUser.profile_image_path} alt="Profile" style={{ width: '100%', height: 'auto', objectFit: 'contain', maxHeight: '300px', margin: '20px auto', display: 'block' }} />
       )}
-      <p style={{ margin: '10px 0', textAlign: 'center' }}>Email: {email}</p>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+      <p>Email: {currentUser?.email}</p>
+      <form onSubmit={handleSubmit}>
         <div className="form-control">
           <label>Profile Image:</label>
-          <input type="file" onChange={handleFileChange} disabled={loading} style={{ padding: '10px', margin: '10px 0' }} />
+          <input type="file" onChange={handleFileChange} disabled={loading} />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={loading} style={{ padding: '10px 20px', borderRadius: '5px', border: 'none', backgroundColor: '#4CAF50', color: 'white' }}>Update Profile</button>
+        <button type="submit" disabled={loading} className="btn btn-primary">Update Profile</button>
       </form>
-      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button onClick={() => { localStorage.removeItem('user'); navigate('/'); }} className="btn btn-secondary" disabled={loading} style={{ marginRight: '10px' }}>Logout</button>
-        <Link to="/dashboard" className="btn" style={{ backgroundColor: '#f0f0f0', color: '#333', textDecoration: 'none', padding: '10px 20px', borderRadius: '5px' }}>Back to Dashboard</Link>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div style={{ marginTop: '20px' }}>
+        <button onClick={logout} className="btn btn-secondary">Logout</button>
+        <Link to="/dashboard" className="btn">Back to Dashboard</Link>
       </div>
     </div>
   );
