@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
+// Export the AuthContext for use in components that consume the context directly
+export const AuthContext = createContext();
 
+// Export a hook for easy use of the context
 export function useAuth() {
   return useContext(AuthContext);
 }
@@ -26,6 +28,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // Persist user and token changes to localStorage
   useEffect(() => {
     localStorage.setItem('user', JSON.stringify(currentUser));
     localStorage.setItem('token', authToken);
