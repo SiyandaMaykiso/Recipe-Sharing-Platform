@@ -34,7 +34,7 @@ const Dashboard = () => {
             console.log("Token found, fetching recipes.");
             fetchRecipes(token);
         }
-    }, [getTokenFromLocalStorage, navigate]); // Adding getTokenFromLocalStorage to dependency array
+    }, [navigate]); // Adding getTokenFromLocalStorage to dependency array
     
     const fetchRecipes = async (token) => {
         try {
