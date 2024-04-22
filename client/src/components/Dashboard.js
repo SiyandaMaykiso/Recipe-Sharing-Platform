@@ -42,7 +42,6 @@ const Dashboard = () => {
             setRecipes(data);
         } catch (error) {
             console.error("Error fetching recipes:", error);
-            navigate('/login'); // Navigate to login if there is an error fetching
         }
     }, [authToken, navigate]);
 
