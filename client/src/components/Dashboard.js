@@ -16,9 +16,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log('Checking user token on dashboard:', localStorage.getItem('token'));
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = user ? user.token : null;
+        const token = getTokenFromLocalStorage();
         if (!token) {
             navigate('/login');
         } else {
@@ -26,10 +24,10 @@ const Dashboard = () => {
         }
     }, [navigate]);
 
-    useEffect(() => {
-        
-        document.querySelectorAll('textarea').forEach(autoExpandTextArea);
-    }, [recipes, isEditing]);  
+    const getTokenFromLocalStorage = () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user ? user.token : null;
+    };
 
     const fetchRecipes = async (token) => {
         try {
