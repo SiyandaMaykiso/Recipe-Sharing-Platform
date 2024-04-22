@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Make sure the path to AuthContext is correct
+import { useAuth } from '../contexts/AuthContext'; // Correct the path to AuthContext as necessary
 
 const Dashboard = () => {
-    const { authToken } = useAuth();  // Get authToken from AuthContext
+    const { authToken } = useAuth();
     const [recipes, setRecipes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editFormData, setEditFormData] = useState({
@@ -17,40 +17,38 @@ const Dashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            if (!authToken) {
-                console.error('No authToken found, redirecting to login.');
-                navigate('/login');
-                return;
+    const fetchRecipes = useCallback(async () => {
+        if (!authToken) {
+            console.error('No authToken found, redirecting to login.');
+            navigate('/login');
+            return;
+        }
+
+        try {
+            const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to fetch recipes: ${response.status} ${errorText}`);
             }
-    
-            try {
-                const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                });
-    
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to fetch recipes: ${response.status} ${errorText}`);
-                }
-    
-                const data = await response.json();
-                setRecipes(data);
-            } catch (error) {
-                console.error("Error fetching recipes:", error);
-                if (response.status === 403 || response.status === 401) {
-                    navigate('/login'); // Navigate to login if token is invalid or expired
-                }
-            }
-        };
-    
-        fetchRecipes();
+
+            const data = await response.json();
+            setRecipes(data);
+        } catch (error) {
+            console.error("Error fetching recipes:", error);
+            navigate('/login'); // Navigate to login if there is an error fetching
+        }
     }, [authToken, navigate]);
+
+    useEffect(() => {
+        fetchRecipes();
+    }, [fetchRecipes]);
 
     const startEdit = (recipe) => {
         setIsEditing(true);
