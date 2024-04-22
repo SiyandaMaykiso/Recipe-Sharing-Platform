@@ -11,6 +11,7 @@ export function useAuth() {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('user')));
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('token'));
+  const [loading, setLoading] = useState(true);  // Added loading state
 
   // Initialize auth from localStorage on mount
   useEffect(() => {
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         }
         logout();
       }
+      setLoading(false);  // Set loading to false after initialization
     };
 
     initAuth();
@@ -58,8 +60,10 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       setCurrentUser(data.user);
       setAuthToken(data.token);
+      setLoading(false);  // Ensure loading is set to false after login
     } catch (error) {
       console.error("Login error:", error);
+      setLoading(false);  // Ensure loading is set to false if an error occurs
       throw error;
     }
   };
@@ -69,11 +73,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setCurrentUser(null);
     setAuthToken(null);
+    setLoading(false);  // Reset loading on logout
   }, []);
 
   const setUserAndToken = (user, token) => {
     setCurrentUser(user);
     setAuthToken(token);
+    setLoading(false);  // Update loading state when user and token are set manually
   };
 
   const getAuthHeader = () => {
@@ -106,6 +112,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     authToken,
+    loading, // Include loading in the context value
     login,
     logout,
     getAuthHeader,

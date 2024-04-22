@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'; // Correct the path to AuthContext as necessary
 
 const Dashboard = () => {
-    const { authToken } = useAuth();
+    const { authToken, loading } = useAuth();  // Access loading from the context
     const [recipes, setRecipes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editFormData, setEditFormData] = useState({
@@ -18,6 +18,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     const fetchRecipes = useCallback(async () => {
+        if (loading) return;  // Check if context is still loading and return early
         if (!authToken) {
             console.error('No authToken found, redirecting to login.');
             navigate('/login');
@@ -43,7 +44,7 @@ const Dashboard = () => {
         } catch (error) {
             console.error("Error fetching recipes:", error);
         }
-    }, [authToken, navigate]);
+    }, [authToken, navigate, loading]);  // Include loading in the dependency array
 
     useEffect(() => {
         fetchRecipes();

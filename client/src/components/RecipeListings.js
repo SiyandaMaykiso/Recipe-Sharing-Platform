@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Correct the import path as necessary
+import { useAuth } from '../contexts/AuthContext'; // Correct the path to AuthContext as necessary
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
   const navigate = useNavigate();
-  const { authToken } = useAuth(); // Directly use authToken from AuthContext
+  const { authToken, loading } = useAuth(); // Retrieve loading state along with authToken
 
   useEffect(() => {
+    if (loading) {
+      console.log('Authentication context is still loading.');
+      return; // Return early while the auth context is loading
+    }
+
     if (!authToken) {
       console.error('No token available. Redirecting to login.');
       navigate('/login');
@@ -39,7 +44,7 @@ const RecipeListings = () => {
     };
 
     fetchRecipes();
-  }, [navigate, authToken]); // Depend on authToken instead of currentUser
+  }, [navigate, authToken, loading]); // Include loading in the dependency array
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
