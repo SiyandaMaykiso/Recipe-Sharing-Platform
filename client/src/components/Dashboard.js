@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';  // Make sure the path to AuthContext is correct
 
 const Dashboard = () => {
+    const { authToken } = useAuth();  // Get authToken from AuthContext
     const [recipes, setRecipes] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [editFormData, setEditFormData] = useState({
@@ -15,33 +17,20 @@ const Dashboard = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
 
-    // Retrieve token from localStorage
-    const getTokenFromLocalStorage = () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        return user ? user.token : null;
-    };
-
-    // useEffect is now dependent on getTokenFromLocalStorage function
-    
     useEffect(() => {
-        console.log("Checking token status...");
-        const token = getTokenFromLocalStorage();
-        console.log("Token on load:", token); // Debugging line to check the token
-        if (!token) {
-            console.log("No token found, navigating to login.");
+        if (!authToken) {
             navigate('/login');
         } else {
-            console.log("Token found, fetching recipes.");
-            fetchRecipes(token);
+            fetchRecipes();
         }
-    }, [navigate]); // Adding getTokenFromLocalStorage to dependency array
-    
-    const fetchRecipes = async (token) => {
+    }, [authToken, navigate]);
+
+    const fetchRecipes = async () => {
         try {
             const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                 },
             });
             if (!response.ok) throw new Error('Failed to fetch recipes');
@@ -61,8 +50,7 @@ const Dashboard = () => {
             ingredients: recipe.ingredients || '',
             instructions: recipe.instructions || '',
         });
-
-         window.scrollTo(0, 0);
+        window.scrollTo(0, 0);
     };
 
     const handleEditFormChange = (event) => {
@@ -83,18 +71,17 @@ const Dashboard = () => {
     const handleImageChange = (event) => {
         setEditFormData(prevFormData => ({
             ...prevFormData,
-            image: event.target.files[0] 
+            image: event.target.files[0]
         }));
     };
 
     const autoExpandTextArea = (element) => {
         element.style.height = 'inherit';
-        element.style.height = `${element.scrollHeight}px`; 
+        element.style.height = `${element.scrollHeight}px`;
     };
 
     const saveEdit = async (event) => {
-        event.preventDefault();  
-    
+        event.preventDefault();
         const formData = new FormData();
         formData.append('title', editFormData.title);
         formData.append('description', editFormData.description);
@@ -103,18 +90,16 @@ const Dashboard = () => {
         if (editFormData.image) {
             formData.append('recipeImage', editFormData.image);
         }
-    
-        const token = getTokenFromLocalStorage();
-    
+
         try {
             const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${editFormData.recipe_id}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                 },
                 body: formData,
             });
-    
+
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error("Error updating recipe:", errorResponse);
@@ -122,8 +107,8 @@ const Dashboard = () => {
                 setTimeout(() => setSuccessMessage(''), 5000);
                 return;
             }
-    
-            fetchRecipes(token);
+
+            fetchRecipes();
             setIsEditing(false);
             setSuccessMessage('Recipe updated successfully!');
             setTimeout(() => setSuccessMessage(''), 3000);
@@ -135,16 +120,15 @@ const Dashboard = () => {
     };
 
     const deleteRecipe = async (recipeId) => {
-        const token = getTokenFromLocalStorage();
         try {
             const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${recipeId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                 },
             });
             if (!response.ok) throw new Error('Failed to delete the recipe');
-            fetchRecipes(token);
+            fetchRecipes();
         } catch (error) {
             console.error("Error deleting recipe:", error);
         }
@@ -160,7 +144,7 @@ const Dashboard = () => {
                 <Link to="/user" className="btn">View Profile</Link>
             </div>
             {isEditing && (
-            <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data" className="form-container">
+                <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data" className="form-container">
                     <div className="form-control">
                         <label>Title</label>
                         <input
@@ -172,19 +156,19 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="form-control">
-    <label>Description</label>
-    <textarea
-        name="description"
-        value={editFormData.description}
-        onChange={handleEditFormChange}
-        className="ingredient-input"
-        style={{ overflow: 'hidden', resize: 'none' }} 
-        onInput={(e) => {
-            e.target.style.height = 'inherit';
-            e.target.style.height = `${e.target.scrollHeight}px`;
-        }}
-    />
-</div>
+                        <label>Description</label>
+                        <textarea
+                            name="description"
+                            value={editFormData.description}
+                            onChange={handleEditFormChange}
+                            className="ingredient-input"
+                            style={{ overflow: 'hidden', resize: 'none' }}
+                            onInput={(e) => {
+                                e.target.style.height = 'inherit';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                            }}
+                        />
+                    </div>
                     <div className="form-control">
                         <label>Ingredients</label>
                         <textarea
@@ -195,28 +179,27 @@ const Dashboard = () => {
                         />
                     </div>
                     <div className="form-control">
-  <label>Instructions</label>
-  <textarea
-    name="instructions"
-    value={editFormData.instructions}
-    onChange={handleEditFormChange}
-    className="ingredient-input"
-    style={{ overflow: 'hidden', resize: 'both' }}
-    onInput={(e) => {
-        e.target.style.height = 'inherit';
-        e.target.style.height = `${e.target.scrollHeight}px`;
-    }}
-  />
-</div>
-                    <div className="form-control">
-                    <label htmlFor="image">Recipe Image</label>
-                    <input
-                    type="file"
-                     name="recipeImage"
-                     onChange={handleEditFormChange}
-                    />
+                        <label>Instructions</label>
+                        <textarea
+                            name="instructions"
+                            value={editFormData.instructions}
+                            onChange={handleEditFormChange}
+                            className="ingredient-input"
+                            style={{ overflow: 'hidden', resize: 'both' }}
+                            onInput={(e) => {
+                                e.target.style.height = 'inherit';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                            }}
+                        />
                     </div>
-
+                    <div className="form-control">
+                        <label htmlFor="image">Recipe Image</label>
+                        <input
+                            type="file"
+                            name="recipeImage"
+                            onChange={handleEditFormChange}
+                        />
+                    </div>
                     <button type="button" onClick={saveEdit} className="btn">Save</button>
                 </form>
             )}
@@ -236,4 +219,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

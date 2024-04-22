@@ -9,27 +9,26 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user')));
-  const [authToken, setAuthToken] = useState(localStorage.getItem('token'));
+  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('user')));
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('token'));
 
   // Initialize auth from localStorage on mount
   useEffect(() => {
     const initAuth = () => {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const storedToken = localStorage.getItem('token');
-      if (storedUser || storedToken) {
-        if (storedUser && storedToken) {
-          setCurrentUser(storedUser);
-          setAuthToken(storedToken);
-        } else {
-          if (!storedUser) {
-            localStorage.removeItem('user');  // Remove user if no token is present
-          }
-          if (!storedToken) {
-            localStorage.removeItem('token');  // Remove token if no user is present
-          }
-          logout(); // Cleanup state if no valid user or token is found
+      if (storedUser && storedToken) {
+        setCurrentUser(storedUser);
+        setAuthToken(storedToken);
+      } else {
+        // Clean up partial data
+        if (!storedUser) {
+          localStorage.removeItem('user');
         }
+        if (!storedToken) {
+          localStorage.removeItem('token');
+        }
+        logout();
       }
     };
 
@@ -38,16 +37,8 @@ export const AuthProvider = ({ children }) => {
 
   // Persist user and token changes to localStorage
   useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('user');
-    }
-    if (authToken) {
-      localStorage.setItem('token', authToken);
-    } else {
-      localStorage.removeItem('token');
-    }
+    localStorage.setItem('user', JSON.stringify(currentUser));
+    localStorage.setItem('token', authToken);
   }, [currentUser, authToken]);
 
   const login = async (email, password) => {
@@ -114,6 +105,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    authToken,
     login,
     logout,
     getAuthHeader,

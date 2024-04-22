@@ -1,27 +1,27 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext'; // Assuming you have an AuthContext
+import { useAuth } from '../contexts/AuthContext'; // Correct the import path as necessary
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext); // Use context to manage user state
+  const { authToken } = useAuth(); // Directly use authToken from AuthContext
 
   useEffect(() => {
-    if (!currentUser || !currentUser.token) {
+    if (!authToken) {
       console.error('No token available. Redirecting to login.');
       navigate('/login');
       return;
     }
 
-    console.log('Using token from context:', currentUser.token);
+    console.log('Using token from context:', authToken);
 
     const fetchRecipes = async () => {
       try {
         const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${currentUser.token}`,
+            'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           }
         });
@@ -40,7 +40,7 @@ const RecipeListings = () => {
     };
 
     fetchRecipes();
-  }, [navigate, currentUser]);
+  }, [navigate, authToken]); // Depend on authToken instead of currentUser
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -69,4 +69,3 @@ const RecipeListings = () => {
 };
 
 export default RecipeListings;
-
