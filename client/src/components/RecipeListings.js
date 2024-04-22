@@ -6,9 +6,7 @@ const RecipeListings = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log('Checking user token on Recipe Listings:', localStorage.getItem('token'));
-        const user = JSON.parse(localStorage.getItem('user'));
-        const token = user ? user.token : null;
+        const token = getTokenFromLocalStorage();
         if (!token) {
             navigate('/login');
             return;
@@ -16,6 +14,11 @@ const RecipeListings = () => {
 
         fetchRecipes(token);
     }, [navigate]);
+
+    const getTokenFromLocalStorage = () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        return user ? user.token : null;
+    };
 
     const fetchRecipes = async (token) => {
         try {
