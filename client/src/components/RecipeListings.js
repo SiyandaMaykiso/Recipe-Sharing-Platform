@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
+  const [redirect, setRedirect] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,7 +13,7 @@ const RecipeListings = () => {
 
     if (!token) {
       console.error('No token available. Redirecting to login.');
-      navigate('/login');
+      setRedirect(true);
       return;
     }
 
@@ -38,12 +39,18 @@ const RecipeListings = () => {
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
-        navigate('/login'); // Redirect to login on failure
+        setRedirect(true);
       }
     };
 
     fetchRecipes();
   }, [navigate]);
+
+  useEffect(() => {
+    if (redirect) {
+      navigate('/login');
+    }
+  }, [redirect, navigate]);
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
