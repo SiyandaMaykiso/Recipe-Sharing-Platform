@@ -1,40 +1,53 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext'; // Ensure the path to AuthContext is correct
 
 const RecipeListings = () => {
   const [recipes, setRecipes] = useState([]);
   const navigate = useNavigate();
-  const { authToken, loading } = useAuth();
+  const { authToken, loading } = useAuth(); // Access loading and authToken from AuthContext
 
-  // Define fetchRecipes using useCallback at the top level of the component
-  const fetchRecipes = useCallback(async () => {
-    if (loading || !authToken) {
-      if (!authToken) navigate('/login');
+  useEffect(() => {
+    if (loading) {
+      console.log('Authentication context is still loading.');
+      return; // Return early while the auth context is loading
+    }
+
+    if (!authToken) {
+      console.log('No authToken available, redirecting to login.');
+      navigate('/login'); // Navigate to login if no authToken
       return;
     }
 
-    try {
-      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${authToken}`,
-          'Content-Type': 'application/json'
+    console.log('Using token from context:', authToken);
+
+    const fetchRecipes = async () => {
+      console.log('Attempting to fetch recipes with token:', authToken);
+      try {
+        const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          console.error(`Failed to fetch recipes: ${response.status}`, errorResponse);
+          throw new Error(`Failed to fetch recipes: ${response.status}`);
         }
-      });
 
-      if (!response.ok) throw new Error(`Failed to fetch recipes: ${response.status}`);
+        const data = await response.json();
+        setRecipes(data);
+        console.log('Recipes fetched successfully', data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
+    };
 
-      const data = await response.json();
-      setRecipes(data);
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
-    }
-  }, [authToken, navigate, loading]);
-
-  useEffect(() => {
     fetchRecipes();
-  }, [fetchRecipes]);
+  }, [navigate, authToken, loading]); // Include loading and authToken in the dependency array
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
