@@ -6,18 +6,18 @@ const RecipeListings = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchData() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const token = user ? user.token : null;
-  
-      if (!token) {
-        console.error('No token available. Redirecting to login.');
-        navigate('/login');
-        return;
-      }
-  
-      console.log("Using token:", token);
-  
+    console.log('Checking user token on Recipe Listings:', localStorage.getItem('token'));
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = user ? user.token : null;
+
+    if (!token) {
+      console.error('No token available. Redirecting to login.');
+      navigate('/login');
+      return;
+    }
+
+    const fetchRecipes = async () => {
+      console.log("Using token:", token); // Additional logging for token usage
       try {
         const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
           method: 'GET',
@@ -26,22 +26,24 @@ const RecipeListings = () => {
             'Content-Type': 'application/json'
           }
         });
-  
+
+        console.log("Response status on fetching recipes:", response.status); // Debug: Log the response status
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch recipes: ${response.status} ${response.statusText}`);
+          const errorResponse = await response.text();
+          throw new Error(`Failed to fetch recipes: ${response.status} ${errorResponse}`);
         }
-  
+
         const data = await response.json();
         setRecipes(data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
         navigate('/login'); // Redirect to login on failure
       }
-    }
-  
-    fetchData();
+    };
+
+    fetchRecipes();
   }, [navigate]);
-  
 
   return (
     <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
