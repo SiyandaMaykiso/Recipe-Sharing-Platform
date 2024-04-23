@@ -54,6 +54,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (username, email, password) => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!response.ok) throw new Error('Failed to register');
+
+      const data = await response.json();
+      setCurrentUser(data.user);
+      setAuthToken(data.token);
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = useCallback(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -94,6 +116,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    register,
     getAuthHeader,
     updateProfile,
     setUserAndToken,
