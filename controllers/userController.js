@@ -7,61 +7,67 @@ const generateAccessToken = (id, email) => {
     return jwt.sign({ id, email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
+// Assuming you are using a user model with methods like findByEmail and create
+
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
-    console.log("Attempting to register new user:", req.body);
+    console.log("Attempting to register new user with email:", email);
+    
     try {
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
-            console.log("Registration failed: Email already in use.");
+            console.log("Registration failed: Email already in use", email);
             return res.status(409).json({ message: 'Email already in use' });
         }
+        
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(`Password hashed: ${hashedPassword}`);
+        console.log(`Password hashed for ${email}: ${hashedPassword}`);
+        
         const newUser = await User.create(username, email, hashedPassword);
+        console.log("New user created:", newUser);
+        
         const token = generateAccessToken(newUser.user_id, newUser.email);
-        console.log("Registration successful:", newUser);
         res.status(201).json({
             message: 'User created successfully',
             user: { userId: newUser.user_id, username: newUser.username, email: newUser.email },
             token
         });
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('Registration error for email:', email, error);
         res.status(500).json({ message: 'Error registering new user', error: error.message });
     }
 };
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-    console.log("Received password:", password, typeof password);  // Check the type and value of the received password
-
+    console.log("Login attempt for email:", email);
+    
     try {
         const user = await User.findByEmail(email);
         if (!user) {
+            console.log("No user found with email:", email);
             return res.status(404).json({ message: 'User not found' });
         }
-
-        console.log("Stored password for comparison:", user.password);  // Debug: Check the stored password format
+        
+        console.log("Comparing passwords for email:", email);
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
+            console.log("Password mismatch for email:", email);
             return res.status(401).json({ message: 'Incorrect password' });
         }
-
+        
         const token = generateAccessToken(user.user_id, user.email);
-        const { password: _, ...userInfo } = user; 
-
+        console.log("Login successful for email:", email);
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: userInfo
+            user: { userId: user.user_id, username: user.username, email: user.email }
         });
     } catch (error) {
-        console.error('Error during login:', error);
+        console.error('Login error for email:', email, error);
         res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 };
-
 
 exports.authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
