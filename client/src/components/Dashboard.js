@@ -19,7 +19,7 @@ const Dashboard = () => {
 
     const fetchRecipes = useCallback(async () => {
         if (loading || !authToken) {
-            if (!authToken) navigate('/login');
+            if (!authToken) navigate('/login-page');
             return;
         }
 

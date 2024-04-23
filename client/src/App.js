@@ -14,7 +14,7 @@ import RecipeListings from './components/RecipeListings';
 // Helper component for private routes
 function PrivateRoute({ children }) {
   const { authToken } = useAuth();
-  return authToken ? children : <Navigate to="/login" />;
+  return authToken ? children : <Navigate to="/login-page" />;
 }
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route path="/user" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
           <Route path="/add-recipe" element={<PrivateRoute><RecipeForm /></PrivateRoute>} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login-page" element={<Login />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
