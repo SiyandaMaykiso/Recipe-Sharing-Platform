@@ -126,7 +126,7 @@ const Dashboard = () => {
             {successMessage && <div className="success-message">{successMessage}</div>}
             <div className="nav-links">
                 <Link to="/add-recipe" className="btn btn-primary">Add New Recipe</Link>
-                <Link to="/recipes" className="btn btn-secondary">View Recipes</Link>
+                <Link to="/view-recipe" className="btn btn-secondary">View Recipes</Link>
                 <Link to="/user" className="btn">View Profile</Link>
             </div>
             {isEditing && (

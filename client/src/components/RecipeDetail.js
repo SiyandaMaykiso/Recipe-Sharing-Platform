@@ -31,7 +31,7 @@ const RecipeDetail = () => {
     <div className="container recipe-detail-container" style={{ maxWidth: '800px', margin: 'auto' }}>
       <div className="navigation-buttons">
         <button onClick={() => navigate('/dashboard')} className="btn btn-secondary">Back to Dashboard</button>
-        <button onClick={() => navigate('/recipes')} className="btn btn-secondary">Back to Recipes</button>
+        <button onClick={() => navigate('/view-recipe')} className="btn btn-secondary">Back to Recipes</button>
         <button onClick={() => navigator.clipboard.writeText(url)} className="btn btn-primary">Copy Recipe Link</button>
       </div>
       {recipe && (

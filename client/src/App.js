@@ -29,8 +29,8 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/recipes" element={<PrivateRoute><RecipeListings /></PrivateRoute>} />
-          <Route path="/recipes/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
+          <Route path="/view-recipe" element={<PrivateRoute><RecipeListings /></PrivateRoute>} />
+          <Route path="/recipe-detail" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
         </Routes>
       </AuthProvider>
     </Router>
