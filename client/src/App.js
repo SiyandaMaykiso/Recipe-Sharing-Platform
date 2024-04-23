@@ -30,7 +30,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/view-recipe" element={<PrivateRoute><RecipeListings /></PrivateRoute>} />
-          <Route path="/recipe-detail" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
+          <Route path="/recipe-detail/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
         </Routes>
       </AuthProvider>
     </Router>
