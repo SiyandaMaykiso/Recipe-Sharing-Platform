@@ -64,7 +64,7 @@ const RecipeListings = () => {
               style={{ width: '100%', height: '200px', objectFit: 'cover' }}
             />
             <h3>{recipe.title}</h3>
-            <Link to={`/recipes/${recipe.recipe_id}`} className="btn">
+            <Link to={`/recipe-detail/${recipe.recipe_id}`} className="btn">
               View Recipe
             </Link>
             <p>{recipe.description.length > 100 ? `${recipe.description.substring(0, 100)}...` : recipe.description}</p>
