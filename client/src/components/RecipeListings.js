@@ -1,172 +1,79 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext'; // Ensure the path to AuthContext is correct
 
-const Dashboard = () => {
-    const { authToken, loading } = useAuth();
-    const [recipes, setRecipes] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editFormData, setEditFormData] = useState({
-        recipe_id: null,
-        title: '',
-        description: '',
-        ingredients: '',
-        instructions: '',
-        image: null,
-    });
-    const [successMessage, setSuccessMessage] = useState('');
-    const navigate = useNavigate();
+const RecipeListings = () => {
+  const [recipes, setRecipes] = useState([]);
+  const navigate = useNavigate();
+  const { authToken, loading } = useAuth(); // Access loading and authToken from AuthContext
 
-    const fetchRecipes = useCallback(async () => {
-        if (loading || !authToken) {
-            if (!authToken) navigate('/login');
-            return;
-        }
+  useEffect(() => {
+    if (loading) {
+      console.log('Authentication context is still loading.');
+      return; // Return early while the auth context is loading
+    }
 
-        try {
-            const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
-                },
-            });
+    if (!authToken) {
+      console.log('No authToken available, redirecting to login.');
+      navigate('/login'); // Navigate to login if no authToken
+      return;
+    }
 
-            if (!response.ok) throw new Error('Failed to fetch recipes');
+    console.log('Using token from context:', authToken);
 
-            const data = await response.json();
-            setRecipes(data);
-        } catch (error) {
-            console.error("Error fetching recipes:", error);
-        }
-    }, [authToken, navigate, loading]);
-
-    useEffect(() => {
-        fetchRecipes();
-    }, [fetchRecipes]);
-
-    const startEdit = (recipe) => {
-        setIsEditing(true);
-        setEditFormData({
-            recipe_id: recipe.recipe_id,
-            title: recipe.title,
-            description: recipe.description,
-            ingredients: recipe.ingredients || '',
-            instructions: recipe.instructions || '',
-        });
-    };
-
-    const handleFormChange = (event) => {
-        const { name, value } = event.target;
-        setEditFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleImageChange = (event) => {
-        setEditFormData((prev) => ({
-            ...prev,
-            image: event.target.files[0]
-        }));
-    };
-
-    const saveEdit = async () => {
-        const formData = new FormData();
-        Object.entries(editFormData).forEach(([key, value]) => {
-            formData.append(key, value);
+    const fetchRecipes = async () => {
+      console.log('Attempting to fetch recipes with token:', authToken);
+      try {
+        const response = await fetch('https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
         });
 
-        try {
-            const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${editFormData.recipe_id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                },
-                body: formData,
-            });
-
-            if (!response.ok) throw new Error('Failed to update recipe');
-
-            setSuccessMessage('Recipe updated successfully!');
-            setTimeout(() => setSuccessMessage(''), 5000);
-            fetchRecipes();
-            setIsEditing(false);
-        } catch (error) {
-            console.error("Error updating recipe:", error);
-            setSuccessMessage('Failed to update the recipe. Please try again.');
-            setTimeout(() => setSuccessMessage(''), 5000);
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          console.error(`Failed to fetch recipes: ${response.status}`, errorResponse);
+          throw new Error(`Failed to fetch recipes: ${response.status}`);
         }
+
+        const data = await response.json();
+        setRecipes(data);
+        console.log('Recipes fetched successfully', data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
     };
 
-    const deleteRecipe = async (recipeId) => {
-        try {
-            const response = await fetch(`https://recipe-sharing-platform-sm-8996552549c5.herokuapp.com/recipes/${recipeId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                },
-            });
+    fetchRecipes();
+  }, [navigate, authToken, loading]); // Include loading and authToken in the dependency array
 
-            if (!response.ok) throw new Error('Failed to delete recipe');
-
-            setSuccessMessage('Recipe deleted successfully!');
-            setTimeout(() => setSuccessMessage(''), 5000);
-            fetchRecipes();
-        } catch (error) {
-            console.error("Error deleting recipe:", error);
-            setSuccessMessage('Failed to delete the recipe. Please try again.');
-            setTimeout(() => setSuccessMessage(''), 5000);
-        }
-    };
-
-    return (
-        <div className="dashboard">
-            <h1>Recipes Dashboard</h1>
-            {successMessage && <div className="success-message">{successMessage}</div>}
-            <div className="nav-links">
-                <Link to="/add-recipe" className="btn btn-primary">Add New Recipe</Link>
-                <Link to="/recipes" className="btn btn-secondary">View Recipes</Link>
-                <Link to="/user" className="btn">View Profile</Link>
-            </div>
-            {isEditing && (
-                <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data" className="form-container">
-                    <div className="form-control">
-                        <label>Title</label>
-                        <input type="text" name="title" value={editFormData.title} onChange={handleFormChange} className="ingredient-input" />
-                    </div>
-                    <div className="form-control">
-                        <label>Description</label>
-                        <textarea name="description" value={editFormData.description} onChange={handleFormChange} className="ingredient-input" />
-                    </div>
-                    <div className="form-control">
-                        <label>Ingredients</label>
-                        <textarea name="ingredients" value={editFormData.ingredients} onChange={handleFormChange} className="ingredient-input" />
-                    </div>
-                    <div className="form-control">
-                        <label>Instructions</label>
-                        <textarea name="instructions" value={editFormData.instructions} onChange={handleFormChange} className="ingredient-input" />
-                    </div>
-                    <div className="form-control">
-                        <label htmlFor="image">Recipe Image</label>
-                        <input type="file" name="recipeImage" onChange={handleImageChange} />
-                    </div>
-                    <button type="button" onClick={saveEdit} className="btn">Save</button>
-                </form>
-            )}
-            <ul className="recipe-list">
-                {recipes.map((recipe) => (
-                    <li key={recipe.recipe_id} className="recipe-item">
-                        <span className="recipe-title">{recipe.title}</span>
-                        <div className="recipe-actions">
-                            <button className="btn" onClick={() => startEdit(recipe)}>Edit</button>
-                            <button className="btn" onClick={() => deleteRecipe(recipe.recipe_id)}>Delete</button>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div className="recipe-listings" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <h1>Recipes</h1>
+      <button onClick={() => navigate('/dashboard')} className="btn btn-secondary" style={{ marginBottom: '20px' }}>
+        Back to Dashboard
+      </button>
+      <div className="recipes-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+        {recipes.map((recipe) => (
+          <div key={recipe.recipe_id} className="recipe-card" style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px', overflow: 'hidden' }}>
+            <img
+              src={recipe.image_path ? recipe.image_path : '/default-recipe-image.jpg'}
+              alt={recipe.title}
+              style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+            />
+            <h3>{recipe.title}</h3>
+            <Link to={`/recipes/${recipe.recipe_id}`} className="btn">
+              View Recipe
+            </Link>
+            <p>{recipe.description.length > 100 ? `${recipe.description.substring(0, 100)}...` : recipe.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default Dashboard;
+export default RecipeListings;
+
