@@ -29,9 +29,14 @@ app.use(commentRoutes);
 app.use(ratingRoutes);
 
 // Catch-all handler for SPA - ensure this is after all other routes
-app.get('*', (req, res) => {
-  console.log('Serving index.html for path:', req.path);
-  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+app.get('*', (req, res, next) => {
+  // Only send the index.html for text/html requests
+  if (req.accepts('html')) {
+    console.log('Serving index.html for path:', req.path);
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  } else {
+    next(); // Continue to other routes if not requesting HTML
+  }
 });
 
 // Error handling middleware
