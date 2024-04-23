@@ -11,7 +11,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (!currentUser || !authToken) {
-      navigate('/login');
+      navigate('/');
     }
   }, [currentUser, authToken, navigate]);
 
