@@ -9,7 +9,7 @@ const { recipeParser } = require('../middleware/cloudinaryConfig');
 router.post('/recipes', authenticate, recipeParser.single('recipeImage'), recipesController.create);
 
 
-router.get('/recipes', recipesController.listByUser);
+router.get('/recipes', authenticate, recipesController.listByUser);
 
 
 router.get('/recipes/:id', recipesController.findById);

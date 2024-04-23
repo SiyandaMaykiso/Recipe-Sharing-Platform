@@ -42,17 +42,20 @@ exports.listByUser = async (req, res) => {
 };
 
 
-exports.listByUser = (req, res) => {
-    // Fetch all recipes available publicly
-    Recipe.findAll()
-        .then(recipes => {
-            res.json(recipes);
-        })
-        .catch(err => {
-            res.status(500).send({ message: "Error retrieving recipes." });
-        });
+exports.findById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const recipe = await Recipe.findById(id);
+        if (recipe) {
+            res.status(200).json(recipe);
+        } else {
+            res.status(404).json({ message: 'Recipe not found' });
+        }
+    } catch (error) {
+        console.error('Error retrieving recipe:', error);
+        res.status(500).json({ message: 'Error retrieving recipe', error: error.message });
+    }
 };
-
 
 exports.update = async (req, res) => {
     const { id } = req.params;
