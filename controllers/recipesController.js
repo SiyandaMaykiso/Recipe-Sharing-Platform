@@ -42,7 +42,7 @@ exports.listByUser = async (req, res) => {
 };
 
 
-eexports.listByUser = (req, res) => {
+exports.listByUser = (req, res) => {
     // Fetch all recipes available publicly
     Recipe.findAll()
         .then(recipes => {
