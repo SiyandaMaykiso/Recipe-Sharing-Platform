@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-//const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const generateAccessToken = (id, email) => {
@@ -7,12 +7,11 @@ const generateAccessToken = (id, email) => {
     return jwt.sign({ id, email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
-// Assuming you are using a user model with methods like findByEmail and create
-
+// Handle user registration
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
     console.log("Attempting to register new user with email:", email);
-    
+
     try {
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
@@ -20,11 +19,8 @@ exports.register = async (req, res) => {
             return res.status(409).json({ message: 'Email already in use' });
         }
         
-        // Store plain password temporarily (for testing purposes only)
-        const plainPassword = password; // Directly use the plain password
-        console.log(`Storing plain password for ${email}: ${plainPassword}`);
-        
-        const newUser = await User.create(username, email, plainPassword);
+        // Pass plain password to the model to handle hashing
+        const newUser = await User.create(username, email, password);
         console.log("New user created:", newUser);
         
         const token = generateAccessToken(newUser.user_id, newUser.email);
@@ -39,6 +35,7 @@ exports.register = async (req, res) => {
     }
 };
 
+// Handle user login
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     console.log("Login attempt for email:", email);
@@ -49,9 +46,9 @@ exports.login = async (req, res) => {
             console.log("No user found with email:", email);
             return res.status(404).json({ message: 'User not found' });
         }
-        
-        // Direct comparison of plain passwords (for testing purposes only)
-        const match = (password === user.password);
+
+        // Compare the plain password with the hashed password stored in the database
+        const match = await bcrypt.compare(password, user.password);
         if (!match) {
             console.log("Password mismatch for email:", email);
             return res.status(401).json({ message: 'Incorrect password' });
