@@ -83,7 +83,7 @@ const RecipeForm = ({ initialValues }) => {
                             <Field id="instructions" name="instructions" as="textarea" placeholder="Cooking Instructions" onInput={handleAutoExpand} />
                         </div>
                         <div className="form-control">
-                            <label htmlFor="recipeImage">Recipe Image</label>
+                            <label htmlFor="recipeImage">Recipe Image (Only Jpeg or PNG)</label>
                             <input id="recipeImage" name="recipeImage" type="file" onChange={handleFileChange} className="input-file" />
                         </div>
                         {submissionError && <div className="error-message">{submissionError}</div>}
