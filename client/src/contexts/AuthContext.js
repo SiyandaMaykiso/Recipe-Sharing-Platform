@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-// Export the AuthContext for use in components that consume the context directly
+
 export const AuthContext = createContext(null);
 
-// Export a hook for easy use of the context
+
 export function useAuth() {
   return useContext(AuthContext);
 }
@@ -11,9 +11,9 @@ export function useAuth() {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('user')));
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);  // Ensures we don't flash screens during load
+  const [loading, setLoading] = useState(true);  
 
-  // Initialize auth from localStorage on mount
+  
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     const storedToken = localStorage.getItem('token');
@@ -21,10 +21,10 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(storedUser);
       setAuthToken(storedToken);
     }
-    setLoading(false);  // Always set loading to false after initial check
+    setLoading(false);  
   }, []);
 
-  // Persist user and token changes to localStorage
+  
   useEffect(() => {
     if (currentUser && authToken) {
       localStorage.setItem('user', JSON.stringify(currentUser));

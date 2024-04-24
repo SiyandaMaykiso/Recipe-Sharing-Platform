@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Ensure correct path to AuthContext
+import { useAuth } from '../contexts/AuthContext';
 
 const UserProfile = () => {
   const { currentUser, authToken, logout } = useAuth();

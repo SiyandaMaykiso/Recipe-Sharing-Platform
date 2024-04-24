@@ -7,7 +7,7 @@ const generateAccessToken = (id, email) => {
     return jwt.sign({ id, email }, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
-// Handle user registration
+
 exports.register = async (req, res) => {
     const { username, email, password } = req.body;
     console.log("Attempting to register new user with email:", email);
@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
             return res.status(409).json({ message: 'Email already in use' });
         }
         
-        // Pass plain password to the model to handle hashing
+        
         const newUser = await User.create(username, email, password);
         console.log("New user created:", newUser);
         
@@ -35,7 +35,7 @@ exports.register = async (req, res) => {
     }
 };
 
-// Handle user login
+
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     console.log("Login attempt for email:", email);
@@ -47,7 +47,7 @@ exports.login = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Compare the plain password with the hashed password stored in the database
+       
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             console.log("Password mismatch for email:", email);

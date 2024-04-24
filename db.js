@@ -1,15 +1,15 @@
 const { Pool } = require('pg');
 
-// Determine SSL usage based on environment
-const useSSL = process.env.NODE_ENV === 'production'; // Use SSL only in production
+
+const useSSL = process.env.NODE_ENV === 'production';
 const sslConfig = useSSL ? {
-  rejectUnauthorized: false, // Required to avoid unauthorized issues on Heroku
-} : null; // No SSL config for non-production environments
+  rejectUnauthorized: false,
+} : null;
 
 console.log("Database connection settings:");
-console.log("SSL Config Active:", useSSL);  // Indicates whether SSL is being used
-console.log("SSL Detailed Config:", JSON.stringify(sslConfig));  // Shows detailed SSL config or null
-console.log("Using DATABASE_URL from environment:", !!process.env.DATABASE_URL);  // Simplified boolean check
+console.log("SSL Config Active:", useSSL); 
+console.log("SSL Detailed Config:", JSON.stringify(sslConfig)); 
+console.log("Using DATABASE_URL from environment:", !!process.env.DATABASE_URL); 
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

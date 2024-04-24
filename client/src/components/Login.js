@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Make sure the path is correct
+import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
-  const { login } = useAuth();  // Using login from AuthContext
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,9 +13,9 @@ function Login() {
     e.preventDefault();
 
     try {
-      // Use the login function from the context
+      
       await login(email, password);
-      navigate('/dashboard');  // Redirect on successful login
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       setLoginError(error.message || 'Failed to login. Please check your credentials.');

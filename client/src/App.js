@@ -11,14 +11,14 @@ import Dashboard from './components/Dashboard';
 import RecipeDetail from './components/RecipeDetail';
 import RecipeListings from './components/RecipeListings';
 
-// Helper component for private routes
+
 function PrivateRoute({ children }) {
   const { authToken } = useAuth();
   return authToken ? children : <Navigate to="/login-page" />;
 }
 
 function App() {
-  // No need to pass initial values from App.js, handle it inside RecipeForm itself
+  
   return (
     <Router>
       <AuthProvider>

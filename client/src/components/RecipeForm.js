@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Make sure the path to AuthContext is correct
+import { useAuth } from '../contexts/AuthContext';
 
 const RecipeForm = ({ initialValues }) => {
-    const { authToken } = useAuth(); // Using authToken from AuthContext
+    const { authToken } = useAuth();
     const [selectedFile, setSelectedFile] = useState(null);
     const [submissionError, setSubmissionError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
