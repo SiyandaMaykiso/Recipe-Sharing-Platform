@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+//const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const generateAccessToken = (id, email) => {
@@ -20,10 +20,11 @@ exports.register = async (req, res) => {
             return res.status(409).json({ message: 'Email already in use' });
         }
         
-        const hashedPassword = await bcrypt.hash(password, 10);
-        console.log(`Password hashed for ${email}: ${hashedPassword}`);
+        // Store plain password temporarily (for testing purposes only)
+        const plainPassword = password; // Directly use the plain password
+        console.log(`Storing plain password for ${email}: ${plainPassword}`);
         
-        const newUser = await User.create(username, email, hashedPassword);
+        const newUser = await User.create(username, email, plainPassword);
         console.log("New user created:", newUser);
         
         const token = generateAccessToken(newUser.user_id, newUser.email);
@@ -49,8 +50,8 @@ exports.login = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         
-        console.log("Comparing passwords for email:", email);
-        const match = await bcrypt.compare(password, user.password);
+        // Direct comparison of plain passwords (for testing purposes only)
+        const match = (password === user.password);
         if (!match) {
             console.log("Password mismatch for email:", email);
             return res.status(401).json({ message: 'Incorrect password' });
